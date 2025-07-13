@@ -31,11 +31,12 @@
       z-index: 10;
     }
 
-    .logo {
-      font-size: 1.5rem;
-      font-weight: bold;
-      color: var(--accent);
-    }
+   .logo {
+  font-size: 1.6rem;
+  font-weight: 900; /* Extra bold */
+  color: #fff; /* White color */
+  letter-spacing: 0.5px;
+}
 
     .search-bar input {
       width: 300px;
@@ -52,20 +53,21 @@
       margin: auto;
     }
 
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-      margin-top: 30px;
-    }
+   .video-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+}
 
-    .video-card {
-      background: #1f1f1f;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: 0.2s;
-    }
+.video-card {
+  background: #1f1f1f;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.2s;
+  width: 450px; /* ✅ fixed width to avoid full stretch */
+}
 
     .video-card:hover {
       transform: scale(1.02);
@@ -115,9 +117,16 @@
     }
 
     #playerContainer {
-      display: none;
-      margin-top: 40px;
-    }
+  display: none;
+  margin-top: 40px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+  max-height: 0;
+}
+#playerContainer.show {
+  display: block;
+  max-height: 1000px;
+}
 
     @media (max-width: 768px) {
       .search-bar input {
@@ -171,12 +180,11 @@
 </header>
 
 <div class="content">
-
   <div class="video-grid" id="videoGrid"></div>
 
   <div id="playerContainer">
     <h2 id="videoTitle">Now Playing</h2>
-    <div id="player"></div>
+    <div id="player" style="width:100%;max-width:100%;aspect-ratio:16/9;"></div>
   </div>
 </div>
 
@@ -185,7 +193,7 @@
     {
       title: "[LIVE] SBS INKIGAYO | JULY 13, 2025",
       thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43kabv7g4/1.png",
-      source: "https://your-m3u8-link-2",
+      source: "https://your-m3u8-link.m3u8", // example
       channel: "Livestream101",
       date: "",
       avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
@@ -193,7 +201,7 @@
     {
       title: "M COUNTDOWN | JULY 03, 2025",
       thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43krt9s7s/m%20countdown.png",
-      source: "https://your-m3u8-link-1",
+      source: "mcountdown10.html",
       channel: "Livestream101",
       date: "3 days ago",
       avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
@@ -201,7 +209,7 @@
     {
       title: "M COUNTDOWN | JULY 10, 2025",
       thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43krt9s7s/m%20countdown.png",
-      source: "https://your-m3u8-link-1",
+      source: "mcountdown3.html",
       channel: "Livestream101",
       date: "3 days ago",
       avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
@@ -215,7 +223,9 @@
   let clapprPlayer = null;
 
   function renderVideos(filter = "") {
+    playerContainer.style.display = "none"; // 🟡 Hide player when filtering
     grid.innerHTML = "";
+
     videos
       .filter(video => video.title.toLowerCase().includes(filter.toLowerCase()))
       .forEach(video => {
@@ -232,9 +242,16 @@
           </div>
         `;
         card.onclick = () => {
+          if (video.source.endsWith(".html")) {
+            playerContainer.style.display = "none";
+            window.open(video.source, "_blank");
+            return;
+          }
+
           if (clapprPlayer) clapprPlayer.destroy();
           playerContainer.style.display = "block";
           videoTitle.innerText = video.title;
+
           clapprPlayer = new Clappr.Player({
             source: video.source,
             parentId: "#player",
@@ -242,6 +259,7 @@
             width: "100%",
             height: "100%"
           });
+
           window.scrollTo({ top: playerContainer.offsetTop - 80, behavior: 'smooth' });
         };
         grid.appendChild(card);
