@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>SBS INKIGAYO</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    .video-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      aspect-ratio: 16 / 9;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="video-container">
+    <iframe
+      src="https://www.youtube.com/embed/_U4OhfafjO8?autoplay=1&mute=1&playsinline=1&controls=1"
+      title="YouTube video player"
+      allow="autoplay; encrypted-media; fullscreen; picture-in-picture; accelerometer; clipboard-write; gyroscope; web-share"
+      allowfullscreen
+    ></iframe>
+  </div>
+
+</body>
+</html>
