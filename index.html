@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyTube</title>
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f0f0f;
+      --text: #fff;
+      --accent: #3ea6ff;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: #181818;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .search-bar input {
+      width: 300px;
+      padding: 8px;
+      border-radius: 2px;
+      border: none;
+      background: #121212;
+      color: #fff;
+    }
+
+    .content {
+      padding: 20px;
+      max-width: 1400px;
+      margin: auto;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-top: 30px;
+    }
+
+    .video-card {
+      background: #1f1f1f;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .video-card:hover {
+      transform: scale(1.02);
+    }
+
+    .video-card img.thumbnail {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-info {
+      display: flex;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .video-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #333;
+      flex-shrink: 0;
+    }
+
+    .video-text {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .video-title {
+      font-weight: bold;
+      font-size: 16px;
+      color: #fff;
+      margin-bottom: 4px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .video-meta {
+      font-size: 13px;
+      color: #aaa;
+    }
+
+    #playerContainer {
+      display: none;
+      margin-top: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .search-bar input {
+        width: 180px;
+      }
+
+      .video-card img.thumbnail {
+        height: 180px;
+      }
+
+      .video-title {
+        font-size: 14px;
+      }
+
+      .video-meta {
+        font-size: 11.5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-bar input {
+        width: 150px;
+      }
+
+      .video-card img.thumbnail {
+        height: 150px;
+      }
+
+      .video-avatar {
+        width: 34px;
+        height: 34px;
+      }
+
+      .video-title {
+        font-size: 13px;
+      }
+
+      .video-meta {
+        font-size: 11px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">LIVESTREAM101</div>
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search videos...">
+  </div>
+</header>
+
+<div class="content">
+
+  <div class="video-grid" id="videoGrid"></div>
+
+  <div id="playerContainer">
+    <h2 id="videoTitle">Now Playing</h2>
+    <div id="player"></div>
+  </div>
+</div>
+
+<script>
+  const videos = [
+    {
+      title: "[LIVE] SBS INKIGAYO | JULY 13, 2025",
+      thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43kabv7g4/1.png",
+      source: "https://your-m3u8-link-2",
+      channel: "Livestream101",
+      date: "",
+      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
+    },
+    {
+      title: "M COUNTDOWN | JULY 03, 2025",
+      thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43krt9s7s/m%20countdown.png",
+      source: "https://your-m3u8-link-1",
+      channel: "Livestream101",
+      date: "3 days ago",
+      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
+    },
+    {
+      title: "M COUNTDOWN | JULY 10, 2025",
+      thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43krt9s7s/m%20countdown.png",
+      source: "https://your-m3u8-link-1",
+      channel: "Livestream101",
+      date: "3 days ago",
+      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
+    }
+  ];
+
+  const grid = document.getElementById("videoGrid");
+  const playerContainer = document.getElementById("playerContainer");
+  const videoTitle = document.getElementById("videoTitle");
+  const searchInput = document.getElementById("searchInput");
+  let clapprPlayer = null;
+
+  function renderVideos(filter = "") {
+    grid.innerHTML = "";
+    videos
+      .filter(video => video.title.toLowerCase().includes(filter.toLowerCase()))
+      .forEach(video => {
+        const card = document.createElement("div");
+        card.className = "video-card";
+        card.innerHTML = `
+          <img class="thumbnail" src="${video.thumbnail}" alt="${video.title}">
+          <div class="video-info">
+            <img class="video-avatar" src="${video.avatar}" alt="${video.channel}">
+            <div class="video-text">
+              <div class="video-title">${video.title}</div>
+              <div class="video-meta">${video.channel} • ${video.date}</div>
+            </div>
+          </div>
+        `;
+        card.onclick = () => {
+          if (clapprPlayer) clapprPlayer.destroy();
+          playerContainer.style.display = "block";
+          videoTitle.innerText = video.title;
+          clapprPlayer = new Clappr.Player({
+            source: video.source,
+            parentId: "#player",
+            autoPlay: true,
+            width: "100%",
+            height: "100%"
+          });
+          window.scrollTo({ top: playerContainer.offsetTop - 80, behavior: 'smooth' });
+        };
+        grid.appendChild(card);
+      });
+  }
+
+  renderVideos();
+
+  searchInput.addEventListener("input", (e) => {
+    renderVideos(e.target.value);
+  });
+</script>
+
+</body>
+</html>
