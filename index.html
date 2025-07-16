@@ -31,12 +31,12 @@
       z-index: 10;
     }
 
-   .logo {
-  font-size: 1.6rem;
-  font-weight: 900; /* Extra bold */
-  color: #fff; /* White color */
-  letter-spacing: 0.5px;
-}
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
 
     .search-bar input {
       width: 300px;
@@ -53,21 +53,53 @@
       margin: auto;
     }
 
-   .video-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px;
-  justify-content: center;
-}
+    .featured-video {
+      text-align: center;
+      margin-bottom: 30px;
+    }
 
-.video-card {
-  background: #1f1f1f;
-  border-radius: 8px;
-  overflow: hidden;
-  cursor: pointer;
-  transition: 0.2s;
-  width: 450px; /* ✅ fixed width to avoid full stretch */
-}
+    .featured-title {
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 15px;
+    }
+
+    .iframe-wrapper {
+      display: flex;
+      justify-content: center;
+    }
+
+    .responsive-iframe {
+      position: relative;
+      width: 100%;
+      max-width: 853px;
+      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+    }
+
+    .responsive-iframe iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .video-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .video-card {
+      background: #1f1f1f;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 450px;
+    }
 
     .video-card:hover {
       transform: scale(1.02);
@@ -117,16 +149,17 @@
     }
 
     #playerContainer {
-  display: none;
-  margin-top: 40px;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
-  max-height: 0;
-}
-#playerContainer.show {
-  display: block;
-  max-height: 1000px;
-}
+      display: none;
+      margin-top: 40px;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      max-height: 0;
+    }
+
+    #playerContainer.show {
+      display: block;
+      max-height: 1000px;
+    }
 
     @media (max-width: 768px) {
       .search-bar input {
@@ -180,6 +213,16 @@
 </header>
 
 <div class="content">
+
+  <div class="featured-video">
+    <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
+    <div class="iframe-wrapper">
+  <div class="responsive-iframe">
+    <iframe src="https://ok.ru/video/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  </div>
+</div>
+  </div>
+
   <div class="video-grid" id="videoGrid"></div>
 
   <div id="playerContainer">
@@ -193,7 +236,7 @@
     {
       title: "[LIVE] SBS INKIGAYO | JULY 13, 2025",
       thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43kabv7g4/1.png",
-      source: "sbsinkigayo13.html", // example
+      source: "sbsinkigayo13.html",
       channel: "Livestream101",
       date: "",
       avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
@@ -223,7 +266,7 @@
   let clapprPlayer = null;
 
   function renderVideos(filter = "") {
-    playerContainer.style.display = "none"; // 🟡 Hide player when filtering
+    playerContainer.style.display = "none";
     grid.innerHTML = "";
 
     videos
