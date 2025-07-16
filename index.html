@@ -64,16 +64,12 @@
       margin-bottom: 15px;
     }
 
-    .iframe-wrapper {
-      display: flex;
-      justify-content: center;
-    }
-
     .responsive-iframe {
       position: relative;
       width: 100%;
       max-width: 853px;
-      padding-top: 56.25%; /* 16:9 Aspect Ratio */
+      aspect-ratio: 16 / 9;
+      margin: auto;
     }
 
     .responsive-iframe iframe {
@@ -201,6 +197,13 @@
         font-size: 11px;
       }
     }
+    
+    .divider {
+  border: none;
+  height: 1px;
+  background-color: #444;
+}
+
   </style>
 </head>
 <body>
@@ -214,14 +217,13 @@
 
 <div class="content">
 
-  <div class="featured-video">
-    <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
-    <div class="iframe-wrapper">
+ <div class="featured-video">
   <div class="responsive-iframe">
-    <iframe src="https://ok.ru/video/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <iframe src="https://ok.ru/videoembed/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
   </div>
+  <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
+  <hr class="divider">
 </div>
-  </div>
 
   <div class="video-grid" id="videoGrid"></div>
 
