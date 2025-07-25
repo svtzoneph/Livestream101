@@ -166,6 +166,42 @@
       display: block;
       max-height: 1000px;
     }
+    
+footer {
+  background-color: #181818;
+  color: #aaa;
+  padding: 30px 20px;
+  text-align: center;
+  font-size: 14px;
+  border-top: 1px solid #333;
+  font-family: 'Roboto', sans-serif;
+}
+
+.footer-content {
+  max-width: 800px;
+  margin: auto;
+}
+
+footer .brand {
+  color: #3ea6ff;
+  font-weight: bold;
+}
+
+.social-handles {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+
+.social-handles a {
+  color: #ccc;
+  text-decoration: none;
+  display: flex;
+  align-items: c
+
 
     @media (max-width: 768px) {
       .search-bar input {
@@ -246,6 +282,19 @@
   </div>
 </div>
 
+<footer>
+  &copy; <span style="color: inherit;">2024</span> 
+  <a href="https://x.com/101_livestream" target="_blank" rel="noopener" style="color: #3ea6ff; text-decoration: none;">
+    LIVESTREAM 101
+  </a> | All rights reserved.
+  <div class="social-handles">
+    <a href="https://t.me/zoneahof" target="_blank" rel="noopener" style="color: #3ea6ff; text-decoration: none;">
+A.H.O.F ZONE
+    </a>
+  </div>
+</footer>
+
+
 <script>
   // Country Restriction
   fetch('https://ipapi.co/json/')
@@ -269,6 +318,8 @@
   "Australia",
   "Mexico",
   "Spain",
+  "Thailand",
+  "Russia",
   "United Arab Emirates"
 ];
 
