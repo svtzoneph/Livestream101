@@ -59,7 +59,7 @@
     }
 
     .featured-title {
-      font-size: 1.8rem;
+      font-size: 1.3rem;
       color: #fff;
       margin-bottom: 15px;
     }
@@ -197,13 +197,12 @@
         font-size: 11px;
       }
     }
-    
-    .divider {
-  border: none;
-  height: 1px;
-  background-color: #444;
-}
 
+    .divider {
+      border: none;
+      height: 1px;
+      background-color: #444;
+    }
   </style>
 </head>
 <body>
@@ -217,13 +216,15 @@
 
 <div class="content">
 
- <div class="featured-video">
-  <div class="responsive-iframe">
-    <iframe src="https://ok.ru/videoembed/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+  <p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
+
+  <div class="featured-video">
+    <div class="responsive-iframe">
+      <iframe src="https://ok.ru/videoembed/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+    <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
+    <hr class="divider">
   </div>
-  <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
-  <hr class="divider">
-</div>
 
   <div class="video-grid" id="videoGrid"></div>
 
@@ -234,6 +235,51 @@
 </div>
 
 <script>
+  // Country Restriction
+  fetch('https://ipapi.co/json/')
+    .then(res => res.json())
+    .then(data => {
+      const allowedCountries = [
+  "United States",
+  "Taiwan",
+  "Malaysia",
+  "Morocco",
+  "Philippines",
+  "Netherlands",
+  "New Zealand",
+  "Myanmar",
+  "Japan",
+  "Indonesia",
+  "Hong Kong",
+  "France",
+  "China",
+  "Canada",
+  "Australia",
+  "United Arab Emirates"
+];
+
+      const userCountry = data.country_name;
+
+      document.getElementById("locationInfo").innerText = `🌍 You are viewing from: ${userCountry}`;
+
+      if (!allowedCountries.includes(userCountry)) {
+        document.body.innerHTML = `
+          <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
+            <h1>Access Restricted</h1>
+            <p>We're sorry, but this website is not available in your region due to geoblocking restrictions. This policy has been implemented to help protect the live stream from being reported, flagged, or taken down. We appreciate your understanding and support.</p>
+            <p>Your location: <b>${userCountry}</b></p>
+          </div>`;
+      }
+    })
+    .catch(() => {
+      document.body.innerHTML = `
+        <div style="text-align:center; padding:100px; color:white; background:#111; font-family:sans-serif;">
+          <h1>🌍 Location Error</h1>
+          <p>We couldn't verify your location. Access denied.</p>
+        </div>`;
+    });
+
+  // Video List
   const videos = [
     {
       title: "[LIVE] SBS INKIGAYO | JULY 13, 2025",
