@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -249,6 +250,23 @@ footer .brand {
       height: 1px;
       background-color: #444;
     }
+    
+    .responsive-iframe {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  max-width: 853px;
+}
+
+.responsive-iframe iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
   </style>
 </head>
 <body>
@@ -262,16 +280,32 @@ footer .brand {
 
 <div class="content">
 
-  <div class="featured-video">
-    <div class="responsive-iframe">
-      <iframe src="https://ok.ru/videoembed/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
-    </div>
-    <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
-    
-      <p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
-      
-    <hr class="divider">
+<div class="featured-video" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: center;">
+  <!-- OK.ru video -->
+  <div class="video-wrapper" style="flex: 1 1 640px; aspect-ratio: 16 / 9; max-width: 853px;">
+    <iframe
+      src="https://ok.ru/videoembed/9630328757976?autoplay=1"
+      frameborder="0"
+      allow="autoplay; fullscreen"
+      allowfullscreen
+      style="width: 100%; height: 100%; border: 0;">
+    </iframe>
   </div>
+
+  <!-- Twitch Chat -->
+  <div class="chat-wrapper" style="flex: 1 1 350px; aspect-ratio: 16 / 9; max-width: 400px;">
+    <iframe
+      src="https://www.twitch.tv/embed/101livestream/chat?parent=livestream101.vercel.app"
+      frameborder="0"
+      allowfullscreen
+      style="width: 100%; height: 100%; border: 0;">
+    </iframe>
+  </div>
+</div>
+
+<h2 class="featured-title" style="text-align: center;">SBS Gayo Daejeon Summer 2025</h2>
+<p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
+<hr class="divider">
 
 
   <div class="video-grid" id="videoGrid"></div>
