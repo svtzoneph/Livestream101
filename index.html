@@ -300,7 +300,34 @@ A.H.O.F ZONE
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
-  const allowedCountryCodes = ["US", "TW", "MY", "MA", "PH", "NL", "NZ", "MM", "JP", "HK", "FR", "CN", "CA", "AU", "MX", "ES", "TH", "RU", "GB", "SG", "PE", "IN", "IT", "SA", "ID", "AE"];
+ const allowedCountries = [
+  { name: "United States", code: "US" },
+  { name: "Taiwan", code: "TW" },
+  { name: "Malaysia", code: "MY" },
+  { name: "Morocco", code: "MA" },
+  { name: "Philippines", code: "PH" },
+  { name: "Netherlands", code: "NL" },
+  { name: "New Zealand", code: "NZ" },
+  { name: "Myanmar", code: "MM" },
+  { name: "Japan", code: "JP" },
+  { name: "Hong Kong", code: "HK" },
+  { name: "France", code: "FR" },
+  { name: "China", code: "CN" },
+  { name: "Canada", code: "CA" },
+  { name: "Australia", code: "AU" },
+  { name: "Mexico", code: "MX" },
+  { name: "Spain", code: "ES" },
+  { name: "Thailand", code: "TH" },
+  { name: "Russia", code: "RU" },
+  { name: "United Kingdom", code: "GB" },
+  { name: "Singapore", code: "SG" },
+  { name: "Peru", code: "PE" },
+  { name: "India", code: "IN" },
+  { name: "Italy", code: "IT" },
+  { name: "Saudi Arabia", code: "SA" },
+  { name: "Indonesia", code: "ID" },
+  { name: "United Arab Emirates", code: "AE" }
+];
 
 
 
