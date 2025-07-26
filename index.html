@@ -302,28 +302,31 @@ A.H.O.F ZONE
     "Singapore", "Peru", "India", "Italy", "Saudi Arabia", "Indonesia", "United Arab Emirates"
   ];
 
-  const enableGeoBlock = true; // set to false to disable all restrictions
-
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
       const userCountry = data.country_name || "Unknown";
-      console.log("User country:", userCountry);
+      console.log("Detected country:", userCountry);
       document.getElementById("locationInfo").innerText = `🌍 You are viewing from: ${userCountry}`;
 
-      if (enableGeoBlock && userCountry !== "Unknown" && !allowedCountries.includes(userCountry)) {
+      // BLOCK if country is not allowed
+      if (!allowedCountries.includes(userCountry)) {
         document.body.innerHTML = `
           <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
-            <h1>Access Restricted</h1>
-            <p>This site is not available in your region.</p>
-            <p>Your location: <b>${userCountry}</b></p>
+            <h1>🚫 Access Restricted</h1>
+            <p>This livestream is not available in your region due to geoblocking rules.</p>
+            <p><strong>Your location:</strong> ${userCountry}</p>
+            <p>If you believe this is a mistake, try connecting to a different network or contact support.</p>
           </div>`;
       }
     })
     .catch((err) => {
-      console.warn("Location check failed:", err);
-      document.getElementById("locationInfo").innerText = `🌍 Couldn't verify location. Allowing access.`;
-      // Don't block if location fails
+      console.error("Geo check failed:", err);
+      document.body.innerHTML = `
+        <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
+          <h1>🌍 Location Error</h1>
+          <p>We couldn't detect your location. Access is denied as a safety measure.</p>
+        </div>`;
     });
 </script>
     
