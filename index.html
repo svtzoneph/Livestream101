@@ -300,36 +300,34 @@ A.H.O.F ZONE
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
- const allowedCountries = [
-  { name: "United States", code: "US" },
-  { name: "Taiwan", code: "TW" },
-  { name: "Malaysia", code: "MY" },
-  { name: "Morocco", code: "MA" },
-  { name: "Philippines", code: "PH" },
-  { name: "Netherlands", code: "NL" },
-  { name: "New Zealand", code: "NZ" },
-  { name: "Myanmar", code: "MM" },
-  { name: "Japan", code: "JP" },
-  { name: "Hong Kong", code: "HK" },
-  { name: "France", code: "FR" },
-  { name: "China", code: "CN" },
-  { name: "Canada", code: "CA" },
-  { name: "Australia", code: "AU" },
-  { name: "Mexico", code: "MX" },
-  { name: "Spain", code: "ES" },
-  { name: "Thailand", code: "TH" },
-  { name: "Russia", code: "RU" },
-  { name: "United Kingdom", code: "GB" },
-  { name: "Singapore", code: "SG" },
-  { name: "Peru", code: "PE" },
-  { name: "India", code: "IN" },
-  { name: "Italy", code: "IT" },
-  { name: "Saudi Arabia", code: "SA" },
-  { name: "Indonesia", code: "ID" },
-  { name: "United Arab Emirates", code: "AE" }
-];
-
-
+const allowedCountries = [
+  "United States",
+  "Taiwan",
+  "Malaysia",
+  "Morocco",
+  "Philippines",
+  "Netherlands",
+  "New Zealand",
+  "Myanmar",
+  "Japan",
+  "Hong Kong",
+  "France",
+  "China",
+  "Canada",
+  "Australia",
+  "Mexico",
+  "Spain",
+  "Thailand",
+  "Russia",
+  "United Kingdom",
+  "Singapore",
+  "Peru",
+  "India",
+  "Italy",
+  "Saudi Arabia",
+  "Indonesia",
+  "United Arab Emirates"
+]; 
 
       const userCountry = data.country_name;
 
