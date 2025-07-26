@@ -300,7 +300,8 @@ A.H.O.F ZONE
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
-   const allowedCountries = ["United States","Taiwan","Malaysia","Morocco","Philippines","Netherlands","New Zealand","Myanmar","Japan","Hong Kong","France","China","Canada","Australia","Mexico","Spain","Thailand","Russia","United Kingdom","Singapore","Peru","India","Italy","Saudi Arabia","Indonesia","United Arab Emirates"];
+  const allowedCountryCodes = ["US", "TW", "MY", "MA", "PH", "NL", "NZ", "MM", "JP", "HK", "FR", "CN", "CA", "AU", "MX", "ES", "TH", "RU", "GB", "SG", "PE", "IN", "IT", "SA", "ID", "AE"];
+
 
 
       const userCountry = data.country_name;
