@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -250,51 +249,12 @@ footer .brand {
       height: 1px;
       background-color: #444;
     }
-    
-    .responsive-iframe {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  max-width: 853px;
-}
-
-.responsive-iframe iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-}
-
-@media (max-width: 768px) {
-  .chat-wrapper,
-  .chat-wrapper iframe {
-    display: none !important;
-    visibility: hidden;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden;
-  }
-}
-
-@media (max-width: 420px) {
-  .chat-wrapper,
-  .chat-wrapper iframe {
-    display: none !important;
-    visibility: hidden;
-    height: 0 !important;
-    width: 0 !important;
-    overflow: hidden;
-  }
-}
-
-
   </style>
 </head>
 <body>
 
-<div class="logo">LIVESTREAM101</div>
+<header>
+  <div class="logo">LIVESTREAM101</div>
   <div class="search-bar">
     <input type="text" id="searchInput" placeholder="Search videos...">
   </div>
@@ -336,59 +296,38 @@ A.H.O.F ZONE
 
 
 <script>
-  // Country Restriction
+  const allowedCountries = [
+    "Philippines", "United States", "Taiwan", "Malaysia", "Morocco", "Netherlands", "New Zealand", "Myanmar", "Japan",
+    "Hong Kong", "France", "China", "Canada", "Australia", "Mexico", "Spain", "Thailand", "Russia", "United Kingdom",
+    "Singapore", "Peru", "India", "Italy", "Saudi Arabia", "Indonesia", "United Arab Emirates"
+  ];
+
+  const enableGeoBlock = true; // set to false to disable all restrictions
+
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
     .then(data => {
- const allowedCountries = [
-  "United States",
-  "Taiwan",
-  "Malaysia",
-  "Morocco",
-  "Philippines",
-  "Netherlands",
-  "New Zealand",
-  "Myanmar",
-  "Japan",
-  "Hong Kong",
-  "France",
-  "China",
-  "Canada",
-  "Australia",
-  "Mexico",
-  "Spain",
-  "Thailand",
-  "Russia",
-  "United Kingdom",
-  "Singapore",
-  "Peru",
-  "India",
-  "Italy",
-  "Saudi Arabia",
-  "Indonesia",
-  "United Arab Emirates"
-]; 
-
-      const userCountry = data.country_name;
-
+      const userCountry = data.country_name || "Unknown";
+      console.log("User country:", userCountry);
       document.getElementById("locationInfo").innerText = `🌍 You are viewing from: ${userCountry}`;
 
-      if (!allowedCountries.includes(userCountry)) {
+      if (enableGeoBlock && userCountry !== "Unknown" && !allowedCountries.includes(userCountry)) {
         document.body.innerHTML = `
           <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
             <h1>Access Restricted</h1>
-            <p>We're sorry, but this website is not available in your region due to geoblocking restrictions. This policy has been implemented to help protect the live stream from being reported, flagged, or taken down. We appreciate your understanding and support.</p>
+            <p>This site is not available in your region.</p>
             <p>Your location: <b>${userCountry}</b></p>
           </div>`;
       }
     })
-    .catch(() => {
-      document.body.innerHTML = `
-        <div style="text-align:center; padding:100px; color:white; background:#111; font-family:sans-serif;">
-          <h1>🌍 Location Error</h1>
-          <p>We couldn't verify your location. Access denied.</p>
-        </div>`;
+    .catch((err) => {
+      console.warn("Location check failed:", err);
+      document.getElementById("locationInfo").innerText = `🌍 Couldn't verify location. Allowing access.`;
+      // Don't block if location fails
     });
+</script>
+    
+    <script>
 
   // Video List
   const videos = [
