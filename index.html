@@ -6,15 +6,14 @@
   <title>Livestream101</title>
   <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-VFNH70R4D9"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-VFNH70R4D9');
-</script>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VFNH70R4D9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VFNH70R4D9');
+  </script>
 
   <style>
     :root {
@@ -166,42 +165,42 @@
       display: block;
       max-height: 1000px;
     }
-    
-footer {
-  background-color: #181818;
-  color: #aaa;
-  padding: 30px 20px;
-  text-align: center;
-  font-size: 14px;
-  border-top: 1px solid #333;
-  font-family: 'Roboto', sans-serif;
-}
 
-.footer-content {
-  max-width: 800px;
-  margin: auto;
-}
+    footer {
+      background-color: #181818;
+      color: #aaa;
+      padding: 30px 20px;
+      text-align: center;
+      font-size: 14px;
+      border-top: 1px solid #333;
+      font-family: 'Roboto', sans-serif;
+    }
 
-footer .brand {
-  color: #3ea6ff;
-  font-weight: bold;
-}
+    .footer-content {
+      max-width: 800px;
+      margin: auto;
+    }
 
-.social-handles {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-  font-size: 13px;
-}
+    footer .brand {
+      color: #3ea6ff;
+      font-weight: bold;
+    }
 
-.social-handles a {
-  color: #ccc;
-  text-decoration: none;
-  display: flex;
-  align-items: c
+    .social-handles {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+      font-size: 13px;
+    }
 
+    .social-handles a {
+      color: #ccc;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+    }
 
     @media (max-width: 768px) {
       .search-bar input {
@@ -268,11 +267,10 @@ footer .brand {
     </div>
     <h2 class="featured-title">SBS Gayo Daejeon Summer 2025</h2>
     
-      <p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
-      
+    <p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
+    
     <hr class="divider">
   </div>
-
 
   <div class="video-grid" id="videoGrid"></div>
 
@@ -283,26 +281,20 @@ footer .brand {
 </div>
 
 <footer>
-  &copy; <span style="color: inherit;">2024</span> 
+  &copy; 2024 
   <a href="https://x.com/101_livestream" target="_blank" rel="noopener" style="color: #3ea6ff; text-decoration: none;">
     LIVESTREAM 101
   </a> | All rights reserved.
   <div class="social-handles">
     <a href="https://t.me/zoneahof" target="_blank" rel="noopener" style="color: #3ea6ff; text-decoration: none;">
-A.H.O.F ZONE
+      A.H.O.F ZONE
     </a>
   </div>
 </footer>
 
-
 <script>
-  const allowedCountries = [
-    "Philippines", "United States", "Taiwan", "Malaysia", "Morocco", "Netherlands", "New Zealand", "Myanmar", "Japan",
-    "Hong Kong", "France", "China", "Canada", "Australia", "Mexico", "Spain", "Thailand", "Russia", "United Kingdom",
-    "Singapore", "Peru", "India", "Italy", "Saudi Arabia", "Indonesia", "United Arab Emirates"
-  ];
-
-  const enableGeoBlock = true; // set to false to disable all restrictions
+  const blockedCountries = ["South Korea", "Korea, Republic of"];
+  const enableGeoBlock = true;
 
   fetch('https://ipapi.co/json/')
     .then(res => res.json())
@@ -311,7 +303,7 @@ A.H.O.F ZONE
       console.log("User country:", userCountry);
       document.getElementById("locationInfo").innerText = `🌍 You are viewing from: ${userCountry}`;
 
-      if (enableGeoBlock && userCountry !== "Unknown" && !allowedCountries.includes(userCountry)) {
+      if (enableGeoBlock && blockedCountries.includes(userCountry)) {
         document.body.innerHTML = `
           <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
             <h1>Access Restricted</h1>
@@ -320,16 +312,9 @@ A.H.O.F ZONE
           </div>`;
       }
     })
-    .catch((err) => {
-      console.warn("Location check failed:", err);
-      document.getElementById("locationInfo").innerText = `🌍 Couldn't verify location. Allowing access.`;
-      // Don't block if location fails
-    });
 </script>
-    
-    <script>
 
-  // Video List
+<script>
   const videos = [
     {
       title: "[LIVE] SBS INKIGAYO | JULY 13, 2025",
