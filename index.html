@@ -263,7 +263,7 @@
 
  <div class="featured-video">
     <div class="responsive-iframe">
-      <iframe src="https://ok.ru/videoembed/9658588602072?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <iframe src="https://ok.ru/videoembed/9658827611864?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
     <h2 class="featured-title">2025 SBS Gayo Daejeon Summer DAY 2</h2>
     
@@ -272,9 +272,18 @@
 
   <div class="featured-video">
     <div class="responsive-iframe">
-      <iframe src="https://ok.ru/videoembed/9630328757976?autoplay=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+      <iframe src="https://ok.ru/videoembed/9658830560984=1" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
     </div>
-    <h2 class="featured-title"> 2025 SBS Gayo Daejeon Summer DAY 1 Replay</h2>
+    <h2 class="featured-title"> 2025 SBS Gayo Daejeon Summer DAY 2 BACK UP</h2>
+    
+    <hr class="divider">
+  </div>
+
+<div class="featured-video">
+    <div class="responsive-iframe">
+      <iframe src="https://ok.ru/videoembed/9658835214040" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+    </div>
+    <h2 class="featured-title"> 2025 SBS Gayo Daejeon Summer DAY 2 BACK UP</h2>
     
     <p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
     
@@ -302,25 +311,45 @@
 </footer>
 
 <script>
+  document.documentElement.style.display = 'none'; // Prevent content flash
+
   const blockedCountries = ["South Korea", "Korea, Republic of"];
   const enableGeoBlock = true;
 
-  fetch('https://ipapi.co/json/')
-    .then(res => res.json())
-    .then(data => {
-      const userCountry = data.country_name || "Unknown";
-      console.log("User country:", userCountry);
-      document.getElementById("locationInfo").innerText = `🌍 You are viewing from: ${userCountry}`;
+  async function checkCountry() {
+    try {
+      const [ipapi, ipwhois] = await Promise.all([
+        fetch("https://ipapi.co/json/").then(res => res.json()),
+        fetch("https://ipwho.is/").then(res => res.json())
+      ]);
 
-      if (enableGeoBlock && blockedCountries.includes(userCountry)) {
+      const countries = [
+        ipapi?.country_name || "",
+        ipwhois?.country || ""
+      ];
+
+      const blocked = countries.some(country => blockedCountries.includes(country));
+
+      if (enableGeoBlock && blocked) {
         document.body.innerHTML = `
           <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
-            <h1>Access Restricted</h1>
+            <h1>🚫 Access Restricted</h1>
             <p>This site is not available in your region.</p>
-            <p>Your location: <b>${userCountry}</b></p>
+            <p>Your location has been blocked.</p>
           </div>`;
+      } else {
+        document.documentElement.style.display = 'block'; // Show content
+        const locationText = countries.find(Boolean) || "Unknown";
+        const locInfo = document.getElementById("locationInfo");
+        if (locInfo) locInfo.innerText = `🌍 You are viewing from: ${locationText}`;
       }
-    })
+    } catch (err) {
+      console.error("Geo check failed:", err);
+      document.documentElement.style.display = 'block'; // Show content anyway
+    }
+  }
+
+  checkCountry();
 </script>
 
 <script>
