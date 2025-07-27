@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>M CountDown</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VFNH70R4D9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-VFNH70R4D9');
+  </script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #000;
+      height: 100vh;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    #player-wrapper {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #player {
+      width: 100%;
+      height: 100%;
+    }
+
+    #skipIntroBtn {
+      position: absolute;
+      bottom: 70px;
+      right: 50px;
+      background-color: #fff;
+      color: #000;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+      z-index: 10;
+      display: none;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      transition: all 0.3s ease;
+    }
+
+    #skipIntroBtn:hover {
+      background-color: #e0e0e0;
+    }
+
+    /* 👇 Mobile-friendly adjustments */
+    @media (max-width: 600px) {
+      #skipIntroBtn {
+        bottom: 300px;
+        right: 20px;
+        padding: 10px 16px;
+        font-size: 11px;
+        border-radius: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="player-wrapper">
+  
+  <div id="player"></div>
+</div>
+
+<script>
+  // Skip to this time in seconds
+  const skipToSeconds = 1532;
+
+  const player = new Clappr.Player({
+    source: "https://vod-cdn.lp-playback.studio/raw/jxf4iblf6wlsyor6526t4tcmtmqa/catalyst-vod-com/hls/195c67fmky9gj89r/index.m3u8",
+    parentId: "#player",
+    autoPlay: true,
+    width: "100%",
+    height: "100%",
+    mute: false
+  });
+
+  const skipBtn = document.getElementById("skipIntroBtn");
+
+  player.on(Clappr.Events.PLAYER_PLAY, () => {
+    const checkInterval = setInterval(() => {
+      const currentTime = player.getCurrentTime();
+      if (currentTime >= 0 && currentTime <= skipToSeconds) {
+        skipBtn.style.display = "block";
+      } else {
+        skipBtn.style.display = "none";
+        clearInterval(checkInterval);
+      }
+    }, 500);
+  });
+
+  skipBtn.addEventListener("click", () => {
+    player.seek(skipToSeconds);
+    skipBtn.style.display = "none";
+  });
+</script>
+
+</body>
+</html>
