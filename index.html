@@ -242,6 +242,7 @@ window.onload = function () {
           controls: [
             "play-large",
             "play",
+            "progress",
             "current-time",
             "mute",
             "volume",
@@ -267,7 +268,7 @@ window.onload = function () {
         watermark.style.position = 'absolute';
         watermark.style.top = '20px';
         watermark.style.left = '20px';
-        watermark.style.color = 'black';
+        watermark.style.color = 'white';
         watermark.style.fontSize = '12px';
         watermark.style.fontWeight = 'bold';
         watermark.style.pointerEvents = 'none';
@@ -279,8 +280,8 @@ window.onload = function () {
 player.on('enterfullscreen', () => {
   // Adjust watermark
   watermark.style.fontSize = '19px';
-  watermark.style.top = '35px';
-  watermark.style.left = '80px';
+  watermark.style.top = '30px';
+  watermark.style.left = '85px';
 
   // Request landscape orientation
   if (screen.orientation && screen.orientation.lock) {
