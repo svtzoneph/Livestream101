@@ -1,254 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Livestream101</title>
-  <script src="https://cdn.jsdelivr.net/npm/clappr@latest/dist/clappr.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VFNH70R4D9"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-VFNH70R4D9');
-  </script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Livestream101</title>
 
-  <style>
-    :root {
-      --bg: #0f0f0f;
-      --text: #fff;
-      --accent: #3ea6ff;
-    }
+<!-- HLS.js + Plyr -->
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 
-    body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: var(--bg);
-      color: var(--text);
-    }
+<style>
+:root {
+  --bg: #0f0f0f;
+  --text: #fff;
+  --accent: #3ea6ff;
+}
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 10px 20px;
-      background: #181818;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+    display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ensures the body takes full height */
+}
 
-    .logo {
-      font-size: 1.6rem;
-      font-weight: 900;
-      color: #fff;
-      letter-spacing: 0.5px;
-    }
+.video-container {
+  flex: 1; /* makes video-container expand to fill available space */
+}
 
-    .search-bar input {
-      width: 300px;
-      padding: 8px;
-      border-radius: 2px;
-      border: none;
-      background: #121212;
-      color: #fff;
-    }
+footer {
+  margin-top: auto; /* pushes footer to the bottom if content is short */
+}
 
-    .content {
-      padding: 20px;
-      max-width: 1400px;
-      margin: auto;
-    }
+/* Header */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: #181818;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
 
-    .featured-video {
-      text-align: center;
-      margin-bottom: 30px;
-    }
+.logo { font-size: 1.6rem; font-weight: 900; }
+.search-bar input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px;
+  border: none;
+  background: #121212;
+  color: #fff;
+  border-radius: 6px;
+}
 
-    .featured-title {
-      font-size: 1.3rem;
-      color: #fff;
-      margin-bottom: 15px;
-    }
+/* Video container */
+.video-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  gap: 20px;
+}
 
-    .responsive-iframe {
-      position: relative;
-      width: 100%;
-      max-width: 853px;
-      aspect-ratio: 16 / 9;
-      margin: auto;
-    }
+.videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+}
 
-    .responsive-iframe iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
+.video-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #181818;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  position: relative;
+}
 
-    .video-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 24px;
-      justify-content: center;
-    }
+.watermark {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none; /* clicks pass through */
+  z-index: 9999; /* high value ensures it appears over video */
+}
 
-    .video-card {
-      background: #1f1f1f;
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
-      transition: 0.2s;
-      width: 450px;
-    }
+/* Make watermark scale in fullscreen */
+.plyr--video .watermark {
+  transition: all 0.2s ease;
+}
 
-    .video-card:hover {
-      transform: scale(1.02);
-    }
+.plyr--fullscreen .watermark {
+  font-size: 24px;
+  top: 20px;
+  left: 20px;
+}
 
-    .video-card img.thumbnail {
-      width: 100%;
-      height: 240px;
-      object-fit: cover;
-      display: block;
-    }
+.player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  background: #000;
+}
 
-    .video-info {
-      display: flex;
-      gap: 12px;
-      padding: 14px;
-    }
+.video-label {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #ccc;
+  text-align: center;
+}
 
-    .video-avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #333;
-      flex-shrink: 0;
-    }
 
-    .video-text {
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
+/* Footer */
+footer {
+  background: #181818;
+  color: #aaa;
+  padding: 30px 20px;
+  text-align: center;
+  font-size: 14px;
+  border-top: 1px solid #333;
+}
 
-    .video-title {
-      font-weight: bold;
-      font-size: 16px;
-      color: #fff;
-      margin-bottom: 4px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+.social-handles {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
 
-    .video-meta {
-      font-size: 13px;
-      color: #aaa;
-    }
+.social-handles a { color: var(--accent); text-decoration: none; }
 
-    #playerContainer {
-      display: none;
-      margin-top: 40px;
-      overflow: hidden;
-      transition: max-height 0.3s ease;
-      max-height: 0;
-    }
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .videos { gap: 20px; }
+}
 
-    #playerContainer.show {
-      display: block;
-      max-height: 1000px;
-    }
+@media screen and (max-width: 480px) {
+  header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .search-bar input { max-width: 100%; }
+}
 
-    footer {
-      background-color: #181818;
-      color: #aaa;
-      padding: 30px 20px;
-      text-align: center;
-      font-size: 14px;
-      border-top: 1px solid #333;
-      font-family: 'Roboto', sans-serif;
-    }
+/* Plyr controls color */
+/* Main control bar color */
+:root {
+  --plyr-color-main: #aaa; /* Gray for buttons, sliders, progress, etc. */
+}
 
-    .footer-content {
-      max-width: 800px;
-      margin: auto;
-    }
+/* Optional: hover effect */
+.plyr__control:hover,
+.plyr__control--pressed {
+  color: #fff !important; /* White on hover/active */
+}
 
-    footer .brand {
-      color: #3ea6ff;
-      font-weight: bold;
-    }
-
-    .social-handles {
-      margin-top: 10px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      flex-wrap: wrap;
-      font-size: 13px;
-    }
-
-    .social-handles a {
-      color: #ccc;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-    }
-
-    @media (max-width: 768px) {
-      .search-bar input {
-        width: 180px;
-      }
-
-      .video-card img.thumbnail {
-        height: 180px;
-      }
-
-      .video-title {
-        font-size: 14px;
-      }
-
-      .video-meta {
-        font-size: 11.5px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .search-bar input {
-        width: 150px;
-      }
-
-      .video-card img.thumbnail {
-        height: 150px;
-      }
-
-      .video-avatar {
-        width: 34px;
-        height: 34px;
-      }
-
-      .video-title {
-        font-size: 13px;
-      }
-
-      .video-meta {
-        font-size: 11px;
-      }
-    }
-
-    .divider {
-      border: none;
-      height: 1px;
-      background-color: #444;
-    }
-  </style>
+/* Progress bar track */
+.plyr__progress--played {
+  background: #aaa !important; /* Gray played portion */
+}
+</style>
 </head>
 <body>
 
@@ -259,174 +180,104 @@
   </div>
 </header>
 
-<div class="content">
-    
-    <p style="text-align:center; color: #aaa;" id="locationInfo">Checking your location...</p>
-    
-   
-
-  <div class="video-grid" id="videoGrid"></div>
-
-  <div id="playerContainer">
-    <h2 id="videoTitle">Now Playing</h2>
-    <div id="player" style="width:100%;max-width:100%;aspect-ratio:16/9;"></div>
+<div class="video-container" id="videoPage">
+  <div class="videos">
+<div class="video-box">
+  <video id="player1" class="player" playsinline controls poster=""></video>
+  <h4 class="video-label">[TMA] 2025 THE FACT MUSIC AWARDS | MAIN SHOW </h4>
+</div>
   </div>
 </div>
 
-<footer>
-  &copy; 2024 
-  <a href="https://x.com/101_livestream" target="_blank" rel="noopener" style="color: #3ea6ff; text-decoration: none;">
-    LIVESTREAM 101
-  </a> | All rights reserved.
-  <div class="social-handles">
-    <a href="https://t.me/zoneahof" target="_blank" rel="noopener" style="color: #3ea6ff; text-decoration: none;">
-      A.H.O.F ZONE
-    </a>
-  </div>
-</footer>
-
 <script>
-  document.documentElement.style.display = 'none'; // Prevent content flash
-
-  const blockedCountries = ["South Korea", "Korea, Republic of"];
-  const enableGeoBlock = true;
-
-  async function checkCountry() {
-    try {
-      const [ipapi, ipwhois] = await Promise.all([
-        fetch("https://ipapi.co/json/").then(res => res.json()),
-        fetch("https://ipwho.is/").then(res => res.json())
-      ]);
-
-      const countries = [
-        ipapi?.country_name || "",
-        ipwhois?.country || ""
-      ];
-
-      const blocked = countries.some(country => blockedCountries.includes(country));
-
-      if (enableGeoBlock && blocked) {
-        document.body.innerHTML = `
-          <div style="text-align:center; padding:30px; color:white; background:#111; font-family:sans-serif;">
-            <h1>🚫 Access Restricted</h1>
-            <p>This site is not available in your region.</p>
-            <p>Your location has been blocked.</p>
-          </div>`;
-      } else {
-        document.documentElement.style.display = 'block'; // Show content
-        const locationText = countries.find(Boolean) || "Unknown";
-        const locInfo = document.getElementById("locationInfo");
-        if (locInfo) locInfo.innerText = `🌍 You are viewing from: ${locationText}`;
-      }
-    } catch (err) {
-      console.error("Geo check failed:", err);
-      document.documentElement.style.display = 'block'; // Show content anyway
-    }
-  }
-
-  checkCountry();
-</script>
-
-<script>
-  const videos = [
-       {
-      title: "SBS GAYO DAEJEON SUMMER DAY 2 MAIN SHOW | JULY 26, 2025",
-      thumbnail: "https://uploads.onecompiler.io/43ddry4jt/43rtf74y9/jm71747619971905.jpg",
-      source: "mainshow.html",
-      channel: "Livestream101",
-      date: "July 27, 2025",
-      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
-    },
-        {
-      title: "SBS GAYO DAEJEON SUMMER DAY 1 BLUE CARPET | JULY 26, 2025",
-      thumbnail: "https://uploads.onecompiler.io/43ddry4jt/43rtf74y9/jm71747619971905.jpg",
-      source: "bluecarpet.html",
-      channel: "Livestream101",
-      date: "July 26, 2025",
-      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
-    },
+window.onload = function () {
+  const sources = [
     {
-      title: "[LIVE] SBS INKIGAYO | JULY 13, 2025",
-      thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43kabv7g4/1.png",
-      source: "sbsinkigayo13.html",
-      channel: "Livestream101",
-      date: "",
-      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
-    },
-    {
-      title: "M COUNTDOWN | JULY 03, 2025",
-      thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43krt9s7s/m%20countdown.png",
-      source: "mcountdown10.html",
-      channel: "Livestream101",
-      date: "3 days ago",
-      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
-    },
-    {
-      title: "M COUNTDOWN | JULY 10, 2025",
-      thumbnail: "https://uploads.onecompiler.io/432zqmf3k/43krt9s7s/m%20countdown.png",
-      source: "mcountdown3.html",
-      channel: "Livestream101",
-      date: "3 days ago",
-      avatar: "https://uploads.onecompiler.io/43ddry4jt/43ddry8ep/New%20Logo.png"
+      id: "player1",
+      url: "https://ex-nlive-streaming.navercdn.com/chzzk/lip2_kr/cflexnmss2u0002/tur6xes0wdxwqk8kskqzcyheopanxm1m70fq/1080p/hdntl=st%3d1758354969%7eexp%3d1758416179%7eacl%3d%2a%2ftur6xes0wdxwqk8kskqzcyheopanxm1m70fq%2f%2a%7edata%3dhdntl%7ehmac%3dc8183759786ac8996f4e3f33e7989106b225099ffdc778655698b3637d63a72a/rwxpvgvbcepfoeyqoydwgcnpanxm1m6uj1_hls_chunklist.m3u8",
     }
   ];
 
-  const grid = document.getElementById("videoGrid");
-  const playerContainer = document.getElementById("playerContainer");
-  const videoTitle = document.getElementById("videoTitle");
-  const searchInput = document.getElementById("searchInput");
-  let clapprPlayer = null;
+  sources.forEach(src => {
+    const video = document.getElementById(src.id);
+    if (!video) return;
 
-  function renderVideos(filter = "") {
-    playerContainer.style.display = "none";
-    grid.innerHTML = "";
+    if (Hls.isSupported()) {
+      const hls = new Hls({ capLevelToPlayerSize: true });
+      hls.loadSource(src.url);
+      hls.attachMedia(video);
 
-    videos
-      .filter(video => video.title.toLowerCase().includes(filter.toLowerCase()))
-      .forEach(video => {
-        const card = document.createElement("div");
-        card.className = "video-card";
-        card.innerHTML = `
-          <img class="thumbnail" src="${video.thumbnail}" alt="${video.title}">
-          <div class="video-info">
-            <img class="video-avatar" src="${video.avatar}" alt="${video.channel}">
-            <div class="video-text">
-              <div class="video-title">${video.title}</div>
-              <div class="video-meta">${video.channel} • ${video.date}</div>
-            </div>
-          </div>
-        `;
-        card.onclick = () => {
-          if (video.source.endsWith(".html")) {
-            playerContainer.style.display = "none";
-            window.open(video.source, "_blank");
-            return;
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        const availableQualities = hls.levels.map(l => l.height).sort((a, b) => b - a);
+
+        // 1️⃣ Initialize Plyr
+        const player = new Plyr(video, {
+          autoplay: true,
+          seekTime: 10,
+          controls: [
+            "play-large",
+            "play",
+            "current-time",
+            "mute",
+            "volume",
+            "captions",
+            "settings",
+            "airplay",
+            "fullscreen"
+          ],
+          settings: ['quality','speed','captions'],
+          quality: {
+            default: availableQualities[0],
+            options: availableQualities,
+            forced: true,
+            onChange: (newQuality) => {
+              const levelIndex = hls.levels.findIndex(l => l.height === newQuality);
+              hls.currentLevel = levelIndex;
+            }
           }
+        });
+        // Create watermark and attach to Plyr container
+        const watermark = document.createElement('div');
+        watermark.innerText = 'LIVESTREAM101';
+        watermark.style.position = 'absolute';
+        watermark.style.top = '10px';
+        watermark.style.left = '10px';
+        watermark.style.color = 'white';
+        watermark.style.fontSize = '18px';
+        watermark.style.fontWeight = 'bold';
+        watermark.style.pointerEvents = 'none';
+        watermark.style.zIndex = 9999;
 
-          if (clapprPlayer) clapprPlayer.destroy();
-          playerContainer.style.display = "block";
-          videoTitle.innerText = video.title;
+        // Append watermark inside Plyr container
+        video.parentElement.appendChild(watermark);
 
-          clapprPlayer = new Clappr.Player({
-            source: video.source,
-            parentId: "#player",
-            autoPlay: true,
-            width: "100%",
-            height: "100%"
-          });
-
-          window.scrollTo({ top: playerContainer.offsetTop - 80, behavior: 'smooth' });
-        };
-        grid.appendChild(card);
+        // Fullscreen adjustments
+        player.on('enterfullscreen', () => {
+          watermark.style.fontSize = '30px';
+          watermark.style.top = '60px';
+          watermark.style.left = '50px';
+        });
+        player.on('exitfullscreen', () => {
+          watermark.style.fontSize = '12px';
+          watermark.style.top = '20px';
+          watermark.style.left = '20px';
+        });
       });
-  }
-
-  renderVideos();
-
-  searchInput.addEventListener("input", (e) => {
-    renderVideos(e.target.value);
+    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = src.url;
+      new Plyr(video);
+    }
   });
+};
 </script>
+
+<footer>
+  &copy; 2025 
+  <a href="https://x.com/101_livestream" target="_blank">LIVESTREAM 101</a> | All rights reserved.
+  <div class="social-handles">
+    <a href="https://t.me/zoneahof" target="_blank">A.H.O.F ZONE</a>
+  </div>
+</footer>
 
 </body>
 </html>
