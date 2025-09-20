@@ -265,10 +265,10 @@ window.onload = function () {
         const watermark = document.createElement('div');
         watermark.innerText = 'LIVESTREAM101';
         watermark.style.position = 'absolute';
-        watermark.style.top = '10px';
-        watermark.style.left = '10px';
-        watermark.style.color = 'white';
-        watermark.style.fontSize = '18px';
+        watermark.style.top = '20px';
+        watermark.style.left = '20px';
+        watermark.style.color = 'black';
+        watermark.style.fontSize = '12px';
         watermark.style.fontWeight = 'bold';
         watermark.style.pointerEvents = 'none';
         watermark.style.zIndex = 9999;
@@ -278,9 +278,9 @@ window.onload = function () {
 
 player.on('enterfullscreen', () => {
   // Adjust watermark
-  watermark.style.fontSize = '18px';
-  watermark.style.top = '40px';
-  watermark.style.left = '70px';
+  watermark.style.fontSize = '19px';
+  watermark.style.top = '35px';
+  watermark.style.left = '80px';
 
   // Request landscape orientation
   if (screen.orientation && screen.orientation.lock) {
