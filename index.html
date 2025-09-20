@@ -87,26 +87,51 @@ header {
   position: relative;
 }
 
-.watermark {
+/* Base watermark */
+.video-box .watermark {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  font-size: 18px;
+  top: 2%;
+  left: 2%;
+  font-size: 2vw; /* relative to viewport width */
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.4);
-  pointer-events: none; /* clicks pass through */
-  z-index: 9999; /* high value ensures it appears over video */
-}
-
-/* Make watermark scale in fullscreen */
-.plyr--video .watermark {
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  z-index: 9999;
   transition: all 0.2s ease;
 }
 
+/* Fullscreen adjustments (responsive) */
 .plyr--fullscreen .watermark {
-  font-size: 24px;
-  top: 20px;
-  left: 20px;
+  font-size: 3vw;
+  top: 3%;
+  left: 3%;
+}
+
+/* Mobile adjustments */
+@media screen and (max-width: 768px) {
+  .video-box .watermark {
+    font-size: 4vw; /* bigger on small screens but not too large */
+    top: 5%;
+    left: 5%;
+  }
+  .plyr--fullscreen .watermark {
+    font-size: 5vw;
+    top: 5%;
+    left: 5%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .video-box .watermark {
+    font-size: 5vw;
+    top: 5%;
+    left: 5%;
+  }
+  .plyr--fullscreen .watermark {
+    font-size: 6vw;
+    top: 5%;
+    left: 5%;
+  }
 }
 
 .player {
@@ -251,17 +276,31 @@ window.onload = function () {
         // Append watermark inside Plyr container
         video.parentElement.appendChild(watermark);
 
-        // Fullscreen adjustments
-        player.on('enterfullscreen', () => {
-          watermark.style.fontSize = '30px';
-          watermark.style.top = '60px';
-          watermark.style.left = '50px';
-        });
-        player.on('exitfullscreen', () => {
-          watermark.style.fontSize = '12px';
-          watermark.style.top = '20px';
-          watermark.style.left = '20px';
-        });
+player.on('enterfullscreen', () => {
+  // Adjust watermark
+  watermark.style.fontSize = '18px';
+  watermark.style.top = '40px';
+  watermark.style.left = '70px';
+
+  // Request landscape orientation
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('landscape').catch(err => {
+      console.log('Orientation lock failed:', err);
+    });
+  }
+});
+
+player.on('exitfullscreen', () => {
+  // Reset watermark
+  watermark.style.fontSize = '12px';
+  watermark.style.top = '20px';
+  watermark.style.left = '20px';
+
+  // Unlock orientation back to default
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock();
+  }
+});
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = src.url;
