@@ -22,17 +22,17 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: var(--bg);
   color: var(--text);
-    display: flex;
+  display: flex;
   flex-direction: column;
-  min-height: 100vh; /* ensures the body takes full height */
+  min-height: 100vh;
 }
 
 .video-container {
-  flex: 1; /* makes video-container expand to fill available space */
+  flex: 1;
 }
 
 footer {
-  margin-top: auto; /* pushes footer to the bottom if content is short */
+  margin-top: auto;
 }
 
 /* Header */
@@ -59,6 +59,20 @@ header {
   border-radius: 6px;
 }
 
+/* Countdown timer */
+.countdown {
+  font-size: 1.2rem;
+  background: #181818;
+  padding: 12px 24px;
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
 /* Video container */
 .video-container {
   display: flex;
@@ -66,6 +80,7 @@ header {
   align-items: center;
   padding: 30px 20px;
   gap: 20px;
+  color: white;
 }
 
 .videos {
@@ -87,48 +102,27 @@ header {
   position: relative;
 }
 
-/* Base watermark */
+/* Watermark */
 .video-box .watermark {
   position: absolute;
   top: 2%;
   left: 2%;
-  font-size: 2vw; /* relative to viewport width */
+  font-size: 2vw;
   font-weight: bold;
   color: rgba(255, 255, 255, 0.5);
   pointer-events: none;
   z-index: 9999;
-  transition: all 0.2s ease;
 }
 
-/* Fullscreen adjustments (responsive) */
 .plyr--fullscreen .watermark {
   font-size: 3vw;
   top: 3%;
   left: 3%;
 }
 
-/* Mobile adjustments */
 @media screen and (max-width: 768px) {
   .video-box .watermark {
-    font-size: 4vw; /* bigger on small screens but not too large */
-    top: 5%;
-    left: 5%;
-  }
-  .plyr--fullscreen .watermark {
-    font-size: 5vw;
-    top: 5%;
-    left: 5%;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .video-box .watermark {
-    font-size: 5vw;
-    top: 5%;
-    left: 5%;
-  }
-  .plyr--fullscreen .watermark {
-    font-size: 6vw;
+    font-size: 4vw;
     top: 5%;
     left: 5%;
   }
@@ -147,7 +141,6 @@ header {
   color: #ccc;
   text-align: center;
 }
-
 
 /* Footer */
 footer {
@@ -168,31 +161,16 @@ footer {
 
 .social-handles a { color: var(--accent); text-decoration: none; }
 
-/* Responsive adjustments */
-@media screen and (max-width: 768px) {
-  .videos { gap: 20px; }
-}
-
-@media screen and (max-width: 480px) {
-  header { flex-direction: column; align-items: flex-start; gap: 10px; }
-  .search-bar input { max-width: 100%; }
-}
-
-/* Plyr controls color */
-/* Main control bar color */
+/* Plyr controls */
 :root {
-  --plyr-color-main: #aaa; /* Gray for buttons, sliders, progress, etc. */
+  --plyr-color-main: #aaa;
 }
-
-/* Optional: hover effect */
 .plyr__control:hover,
 .plyr__control--pressed {
-  color: #fff !important; /* White on hover/active */
+  color: #fff !important;
 }
-
-/* Progress bar track */
 .plyr__progress--played {
-  background: #aaa !important; /* Gray played portion */
+  background: #aaa !important;
 }
 </style>
 </head>
@@ -206,20 +184,77 @@ footer {
 </header>
 
 <div class="video-container" id="videoPage">
+
+  <!-- Countdown Timer -->
+  <div id="countdown" class="countdown">
+    The stream will start at <span id="start-time"></span> — <span id="timer"></span>
+  </div>
+
   <div class="videos">
-<div class="video-box">
-  <video id="player1" class="player" playsinline controls poster=""></video>
-  <h4 class="video-label"> MCOUNTDOWN </h4>
-</div>
+    <div class="video-box">
+      <video id="player1" class="player" playsinline controls poster=""></video>
+      <h4 class="video-label">[LIVE] Special Episode Bon Appetit Your Majesty “Never Leave the Palace”</h4>
+    </div>
   </div>
 </div>
 
 <script>
+/* Countdown Timer Section */
+const countdownElement = document.getElementById("countdown");
+const timerElement = document.getElementById("timer");
+const startTimeDisplay = document.getElementById("start-time");
+
+// 🕒 Set your stream start time here (Philippine time)
+const streamStart = new Date("2025-10-04T18:40:00+08:00"); // Example: 6:40 PM PHT
+
+// Display formatted start time
+startTimeDisplay.textContent = streamStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+// Check if already refreshed before
+const hasRefreshed = localStorage.getItem("streamRefreshed");
+const now = new Date();
+
+if (now >= streamStart) {
+  // If user opens after stream start, show LIVE message and do not refresh
+  countdownElement.innerHTML = "STREAMING!!";
+} else {
+  const timerInterval = setInterval(() => {
+    const now = new Date();
+    const distance = streamStart - now;
+
+    if (distance <= 0) {
+      clearInterval(timerInterval);
+
+      // Only refresh once
+      if (!hasRefreshed) {
+        countdownElement.innerHTML = "🚀 Starting the stream...";
+        localStorage.setItem("streamRefreshed", "true");
+
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      } else {
+        countdownElement.innerHTML = "🎬 Stream is LIVE now!";
+      }
+
+    } else {
+      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((distance / (1000 * 60)) % 60);
+      const seconds = Math.floor((distance / 1000) % 60);
+      timerElement.textContent = `${hours.toString().padStart(2,'0')}:${minutes
+        .toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    }
+  }, 1000);
+}
+</script>
+
+<script>
+/* HLS + Plyr Player */
 window.onload = function () {
   const sources = [
     {
       id: "player1",
-      url: "https://sin.media-delivery.net/mnet/tracks-v1a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..nO_I_RTmj04sY-F9.S6Kx_u7MQBh-7GjaBUDpGh1iif1Pz5dVOCptI9wUw2ShRet091OkAtsUEf3RgkR3o5uwYQXpYQwaY0_0pTXtv9yc5NgJR1UTQr8w5EPq8CnZKu_EqDL1WfxVggVwE-zmOsLaYylv8gRZVK3itavY9L0PaFCamZfl1ehaA7T4x4HB4_2OOtcNmrY9Uvnoon6VMmudkTkVfph19MOFTsLnQXk4VAhpfkIhmqtXQpjiWwJfjtKz4gioghAtbhf3xdWRtGBja3pTHGpn1Q_mZd2K-PWmg_7b-EH7XFveaOv2DDr2XeyMnluq7hxuwX257F-e87Z0w5R_ZN70zAW6URhOEUsdPprVOTKeFg_KXPM7LB4rKnc6EuNt4J5OGYkKegnUYMUqAgPQWmlj5ma1yHic7xxfltuMn5nBr3bMnLebuOJhzKNkMD4IVF3RJ8s9sRheIo2OhS0tPcTI_rAHQrkaWXBBeh0fcoYvT0u2dY1fw2_CBuE0pqTIY0zCtpRbxnyA_xH8ds0_QJUfcxLiI7ctSRR6oMiaV90-4QOsz0pXnO0.hZlIQ_gy6Ee3HDU0ikkKyQ&platformLanguage=en",
+      url: "https://sin.media-delivery.net/tvn_kr/tracks-v1a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..Iv1l6p04Cl_UwBal.IrxRRCvRk1yBbL1Yy88iO5cEl7xH7QH2gxAL2O7312VawfWZx_Mh2GVoUnvDBKkx-xg-w-A2k7uKRXYiYydV6x7n_s6yEiVCKTR5hOHrIHgCIC_R6tph1npgErceewiEw2G1PbXuxif9L7L73zE511lUPCIIP-x12cDxPcsLB4VF8_TyUZy4pXWThWzI0-B0a2CY74z_qz2LzFOQxm6iyWvKFqkdY7qFdAPIlEWCfKsfuS6NEiwc36GQvKYirBB_-aApRitVnnBQ66HvOgX_xqcMErXmDzpK60ASzQzMIahPpR7hNzKx38RlmlpX_lYzhMZWnXIrQ9_uN995ZrbHwp1xeiude9bw5onkFRLikmwOkGtQ9vls7Pale3aXqrmajLM_XHYF8csWLlr1MQWz1N6wbF4kE5fIPR3JL2tUU9aHuEdwNvQ9JiRJxTu_jdv1Cm5DP2FUgp4-k9lRhLhyqa5Br-04O2HkdaQJ58Z8tzxOdTBYBHlXKsg2WcwQjNBKHVhrYrCBkc4atzv20-Q7d5BiiUUBRP_8x5EBFIFRodqhGA.uB2ZxaZhLbPb8LcJiUjxLA&platformLanguage=en",
     }
   ];
 
@@ -235,14 +270,13 @@ window.onload = function () {
       hls.on(Hls.Events.MANIFEST_PARSED, function () {
         const availableQualities = hls.levels.map(l => l.height).sort((a, b) => b - a);
 
-        // 1️⃣ Initialize Plyr
         const player = new Plyr(video, {
           autoplay: true,
+          muted: false,
           seekTime: 10,
           controls: [
             "play-large",
             "play",
-            "progress",
             "current-time",
             "mute",
             "volume",
@@ -262,54 +296,93 @@ window.onload = function () {
             }
           }
         });
-        // Create watermark and attach to Plyr container
-        const watermark = document.createElement('div');
-        watermark.innerText = 'LIVESTREAM101';
-        watermark.style.position = 'absolute';
-        watermark.style.top = '20px';
-        watermark.style.left = '20px';
-        watermark.style.color = 'white';
-        watermark.style.fontSize = '12px';
-        watermark.style.fontWeight = 'bold';
-        watermark.style.pointerEvents = 'none';
-        watermark.style.zIndex = 9999;
 
-        // Append watermark inside Plyr container
-        video.parentElement.appendChild(watermark);
+        // Ensure autoplay works across browsers
+        video.play().catch(() => {
+          video.muted = true;
+          video.play();
+        });
 
-player.on('enterfullscreen', () => {
-  // Adjust watermark
-  watermark.style.fontSize = '19px';
-  watermark.style.top = '30px';
-  watermark.style.left = '85px';
+ // Watermark setup (phone-friendly, click-through)
+const watermark = document.createElement('img');
+watermark.src = 'https://uploads.onecompiler.io/43ddry4jt/43ymwg7hc/watermark.png';
+watermark.alt = 'Watermark';
+watermark.style.position = 'absolute';
+watermark.style.bottom = '15px';
+watermark.style.right = '15px';
+watermark.style.width = '80px';
+watermark.style.opacity = '0.8';
+watermark.style.pointerEvents = 'none'; // <<< now clicks go through
+watermark.style.userSelect = 'none';
+watermark.style.zIndex = 9999;
+watermark.style.transition = 'all 0.3s ease';
+video.parentElement.appendChild(watermark);
 
-  // Request landscape orientation
-  if (screen.orientation && screen.orientation.lock) {
-    screen.orientation.lock('landscape').catch(err => {
-      console.log('Orientation lock failed:', err);
-    });
-  }
-});
+        // Responsive watermark for phones
+        const adjustWatermark = () => {
+          if (window.innerWidth < 768) {
+            watermark.style.width = '60px';
+            watermark.style.bottom = '10px';
+            watermark.style.right = '10px';
+            watermark.style.opacity = '0.9';
+          } else {
+            watermark.style.width = '80px';
+            watermark.style.bottom = '15px';
+            watermark.style.right = '15px';
+            watermark.style.opacity = '0.8';
+          }
+        };
+        adjustWatermark();
+        window.addEventListener('resize', adjustWatermark);
 
-player.on('exitfullscreen', () => {
-  // Reset watermark
-  watermark.style.fontSize = '12px';
-  watermark.style.top = '20px';
-  watermark.style.left = '20px';
+        // Double tap to resize watermark
+        let lastTap = 0;
+        watermark.addEventListener('touchend', () => {
+          const now = new Date().getTime();
+          if (now - lastTap < 300) {
+            watermark.style.width =
+              watermark.style.width === '60px' || watermark.style.width === '80px'
+                ? '100px'
+                : '60px';
+          }
+          lastTap = now;
+        });
 
-  // Unlock orientation back to default
-  if (screen.orientation && screen.orientation.unlock) {
-    screen.orientation.unlock();
-  }
-});
+        // Auto-rotate video when entering fullscreen
+        player.on('enterfullscreen', async () => {
+          try {
+            if (screen.orientation && screen.orientation.lock) {
+              await screen.orientation.lock('landscape');
+            }
+          } catch (err) {
+            console.warn('Auto-rotation not supported', err);
+          }
+          watermark.style.width = window.innerWidth < 768 ? '100px' : '120px';
+          watermark.style.bottom = '25px';
+          watermark.style.right = '25px';
+        });
+
+        // Revert rotation on exit fullscreen
+        player.on('exitfullscreen', async () => {
+          try {
+            if (screen.orientation && screen.orientation.unlock) {
+              await screen.orientation.unlock();
+            }
+          } catch (err) {
+            console.warn('Orientation unlock not supported', err);
+          }
+          adjustWatermark();
+        });
       });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = src.url;
-      new Plyr(video);
+      new Plyr(video, { autoplay: true });
     }
   });
 };
 </script>
+
+
 
 <footer>
   &copy; 2025 
