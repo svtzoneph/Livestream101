@@ -322,7 +322,7 @@ video.parentElement.appendChild(watermark);
         const adjustWatermark = () => {
           if (window.innerWidth < 768) {
             watermark.style.width = '60px';
-            watermark.style.bottom = '10px';
+            watermark.style.bottom = '15px';
             watermark.style.right = '30px';
             watermark.style.opacity = '0.9';
           } else {
@@ -358,8 +358,8 @@ video.parentElement.appendChild(watermark);
             console.warn('Auto-rotation not supported', err);
           }
           watermark.style.width = window.innerWidth < 768 ? '100px' : '120px';
-          watermark.style.bottom = '25px';
-          watermark.style.right = '25px';
+          watermark.style.bottom = '30px';
+          watermark.style.right = '60px';
         });
 
         // Revert rotation on exit fullscreen
