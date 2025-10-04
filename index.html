@@ -308,8 +308,8 @@ const watermark = document.createElement('img');
 watermark.src = 'https://uploads.onecompiler.io/43ddry4jt/43ymwg7hc/watermark.png';
 watermark.alt = 'Watermark';
 watermark.style.position = 'absolute';
-watermark.style.bottom = '15px';
-watermark.style.right = '15px';
+watermark.style.bottom = '20px';
+watermark.style.right = '40px';
 watermark.style.width = '80px';
 watermark.style.opacity = '0.8';
 watermark.style.pointerEvents = 'none'; // <<< now clicks go through
@@ -323,7 +323,7 @@ video.parentElement.appendChild(watermark);
           if (window.innerWidth < 768) {
             watermark.style.width = '60px';
             watermark.style.bottom = '10px';
-            watermark.style.right = '10px';
+            watermark.style.right = '30px';
             watermark.style.opacity = '0.9';
           } else {
             watermark.style.width = '80px';
