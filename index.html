@@ -5,13 +5,176 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Livestream101</title>
 
-<!-- Link external CSS -->
-<link rel="stylesheet" href="style.css" />
-
 <!-- HLS.js + Plyr -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+
+<style>
+:root {
+  --bg: #0f0f0f;
+  --text: #fff;
+  --accent: #3ea6ff;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+   user-select: none;
+  -webkit-user-select: none;
+}
+
+.video-container {
+  flex: 1;
+}
+
+footer {
+  margin-top: auto;
+}
+
+/* Header */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: #181818;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo { font-size: 1.6rem; font-weight: 900; }
+.search-bar input {
+  width: 100%;
+  max-width: 300px;
+  padding: 8px;
+  border: none;
+  background: #121212;
+  color: #fff;
+  border-radius: 6px;
+}
+
+/* Countdown timer */
+.countdown {
+  font-size: 1.2rem;
+  background: #181818;
+  padding: 12px 24px;
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  margin-bottom: 15px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.4);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Video container */
+.video-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 30px 20px;
+  gap: 20px;
+  color: white;
+}
+
+.videos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 30px;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.video-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #181818;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+/* Watermark */
+.video-box .watermark {
+  position: absolute;
+  top: 2%;
+  left: 2%;
+  font-size: 2vw;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.plyr--fullscreen .watermark {
+  font-size: 3vw;
+  top: 3%;
+  left: 3%;
+}
+
+@media screen and (max-width: 768px) {
+  .video-box .watermark {
+    font-size: 4vw;
+    top: 5%;
+    left: 5%;
+  }
+}
+
+.player {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  background: #000;
+}
+
+.video-label {
+  margin-top: 10px;
+  font-size: 16px;
+  color: #ccc;
+  text-align: center;
+}
+
+/* Footer */
+footer {
+  background: #181818;
+  color: #aaa;
+  padding: 30px 20px;
+  text-align: center;
+  font-size: 14px;
+  border-top: 1px solid #333;
+}
+
+.social-handles {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.social-handles a { color: var(--accent); text-decoration: none; }
+
+/* Plyr controls */
+:root {
+  --plyr-color-main: #aaa;
+}
+.plyr__control:hover,
+.plyr__control--pressed {
+  color: #fff !important;
+}
+.plyr__progress--played {
+  background: #aaa !important;
+}
+</style>
 </head>
 <body>
 
@@ -23,12 +186,15 @@
 </header>
 
 <div class="video-container" id="videoPage">
+
+  <!-- Countdown Timer -->
   <div id="countdown" class="countdown">
     The stream will start at <span id="start-time"></span> — <span id="timer"></span>
   </div>
 
   <div class="videos">
     <div class="video-box">
+      <!-- ✅ Added thumbnail poster -->
       <video id="player1" class="player" playsinline controls 
         poster="https://uploads.onecompiler.io/43ddry4jt/43yuf5762/2025isac.png"></video>
       <h4 class="video-label">[PART 2] 2025 Idol Star Athletics Championships</h4>
@@ -36,7 +202,228 @@
   </div>
 </div>
 
-<script src="script.js"></script>
+<script>
+/* Countdown Timer Section */
+const countdownElement = document.getElementById("countdown");
+const timerElement = document.getElementById("timer");
+const startTimeDisplay = document.getElementById("start-time");
+
+// 🕒 Set your stream start time here (Philippine time)
+const streamStart = new Date("2025-10-06T22:39:00+08:00"); // Example: 8:15 PM PHT
+
+// Display formatted start time
+startTimeDisplay.textContent = streamStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+// Check if already refreshed before
+const hasRefreshed = localStorage.getItem("streamRefreshed");
+const now = new Date();
+
+if (now >= streamStart) {
+  // If user opens after stream start, show LIVE message and do not refresh
+  countdownElement.innerHTML = "LIVE NOW!";
+} else {
+  const timerInterval = setInterval(() => {
+    const now = new Date();
+    const distance = streamStart - now;
+
+    if (distance <= 0) {
+      clearInterval(timerInterval);
+
+      // Only refresh once
+      if (!hasRefreshed) {
+        countdownElement.innerHTML = "🚀 Starting the stream...";
+        localStorage.setItem("streamRefreshed", "true");
+
+        setTimeout(() => {
+          location.reload();
+        }, 2000);
+      } else {
+        countdownElement.innerHTML = "LIVE NOW!";
+      }
+
+    } else {
+      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((distance / (1000 * 60)) % 60);
+      const seconds = Math.floor((distance / 1000) % 60);
+      timerElement.textContent = `${hours.toString().padStart(2,'0')}:${minutes
+        .toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    }
+  }, 1000);
+}
+</script>
+
+<script>
+/* HLS + Plyr Player with Manual Quality Switcher */
+window.onload = function () {
+  const sources = [
+    {
+      id: "player1",
+      qualities: {
+        480: "https://sin.media-delivery.net/mbc/tracks-v2a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..D26IA_VzerIW_j25.83Khi46ZCUc6BIWn_HqYkdDIAbrLorarMeIWqJkHQmoiXrRR5VPaWjJTgHLfpO3-3kMiOt4J3Eat3afcWm1xQwi6_mewdhIuM4V9tgejQlTs7DpBvP7r7-dcz5GavcFfBMXgKgM4pDMp-8U3XFLzyAIPrxO5t5TsNGp64vpmOOVfA47-IXspStBeiyOulvGLCx0rR0_yun2qsxhwTgYndEFZXcx6s9GNz_DF0J9usGWltwtoU4t0cJORY9xk4Duorj5Qh01Aw7I1Glww0feKIQPpQrP6mM_rsKHjEGNkwDcHxJBNs-vSGBtge0wbdakLeh9_vG3qNnw9ldBVJaGO-s_79sp99BMevCw7HUltgmvEhT1n4CXhLRy_px3OB13M8uGlvKHyV6XUptjVXS2D0UlscVrLaKjwTxko7wrw0MO_mm2iAjd3WGUMU1OBUT5HYGD3Izf0HNs4KhQDz0Wnt57qcidNYCyH5OC1Wxv-zhAm7jMY8-qtuMLiHisX6MxI8szB2vm1ZElCJQ-cg9RalYyuLFDgeUsVCrPQ1yiM.XXAKPuNjrvkngyzMd_TIZw&platformLanguage=en",
+        1080: "https://sin.media-delivery.net/mbc/tracks-v1a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..D26IA_VzerIW_j25.83Khi46ZCUc6BIWn_HqYkdDIAbrLorarMeIWqJkHQmoiXrRR5VPaWjJTgHLfpO3-3kMiOt4J3Eat3afcWm1xQwi6_mewdhIuM4V9tgejQlTs7DpBvP7r7-dcz5GavcFfBMXgKgM4pDMp-8U3XFLzyAIPrxO5t5TsNGp64vpmOOVfA47-IXspStBeiyOulvGLCx0rR0_yun2qsxhwTgYndEFZXcx6s9GNz_DF0J9usGWltwtoU4t0cJORY9xk4Duorj5Qh01Aw7I1Glww0feKIQPpQrP6mM_rsKHjEGNkwDcHxJBNs-vSGBtge0wbdakLeh9_vG3qNnw9ldBVJaGO-s_79sp99BMevCw7HUltgmvEhT1n4CXhLRy_px3OB13M8uGlvKHyV6XUptjVXS2D0UlscVrLaKjwTxko7wrw0MO_mm2iAjd3WGUMU1OBUT5HYGD3Izf0HNs4KhQDz0Wnt57qcidNYCyH5OC1Wxv-zhAm7jMY8-qtuMLiHisX6MxI8szB2vm1ZElCJQ-cg9RalYyuLFDgeUsVCrPQ1yiM.XXAKPuNjrvkngyzMd_TIZw&platformLanguage=en"
+      },
+      defaultQuality: 1080
+    }
+  ];
+
+  sources.forEach(src => {
+    const video = document.getElementById(src.id);
+    if (!video) return;
+
+    let hls;
+    let currentQuality = src.defaultQuality;
+
+    function loadStream(quality) {
+      const streamUrl = src.qualities[quality];
+      if (!streamUrl) return;
+
+      if (hls) hls.destroy(); // destroy previous instance
+      hls = new Hls({ capLevelToPlayerSize: true });
+      hls.loadSource(streamUrl);
+      hls.attachMedia(video);
+
+      hls.on(Hls.Events.MANIFEST_PARSED, function () {
+        video.play().catch(() => {
+          video.muted = true;
+          video.play();
+        });
+      });
+    }
+
+    const player = new Plyr(video, {
+      autoplay: true,
+      muted: false,
+      seekTime: 10,
+      controls: [
+        "play-large",
+        "play",
+        "current-time",
+        "mute",
+        "volume",
+        "captions",
+        "settings",
+        "airplay",
+        "fullscreen"
+      ],
+      settings: ["quality", "speed", "captions"],
+      quality: {
+        default: src.defaultQuality,
+        options: Object.keys(src.qualities).map(Number),
+        forced: true,
+        onChange: (newQuality) => {
+          currentQuality = newQuality;
+          loadStream(newQuality);
+        }
+      }
+    });
+
+    // Initial load
+    if (Hls.isSupported()) loadStream(currentQuality);
+    else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+      video.src = src.qualities[currentQuality];
+      video.play();
+    }
+
+    /* WATERMARK */
+    const watermark = document.createElement('img');
+    watermark.src = 'https://uploads.onecompiler.io/43ddry4jt/43ymwg7hc/watermark.png';
+    watermark.alt = 'Watermark';
+    watermark.style.position = 'absolute';
+    watermark.style.bottom = '20px';
+    watermark.style.right = '40px';
+    watermark.style.width = '80px';
+    watermark.style.opacity = '0.8';
+    watermark.style.pointerEvents = 'none';
+    watermark.style.userSelect = 'none';
+    watermark.style.zIndex = 9999;
+    video.parentElement.appendChild(watermark);
+
+    const adjustWatermark = () => {
+      if (window.innerWidth < 768) {
+        watermark.style.width = '60px';
+        watermark.style.bottom = '15px';
+        watermark.style.right = '30px';
+        watermark.style.opacity = '0.9';
+      } else {
+        watermark.style.width = '80px';
+        watermark.style.bottom = '15px';
+        watermark.style.right = '60px';
+        watermark.style.opacity = '0.8';
+      }
+    };
+    adjustWatermark();
+    window.addEventListener('resize', adjustWatermark);
+
+    let lastTap = 0;
+    watermark.addEventListener('touchend', () => {
+      const now = new Date().getTime();
+      if (now - lastTap < 300) {
+        watermark.style.width =
+          watermark.style.width === '60px' || watermark.style.width === '80px'
+            ? '100px'
+            : '60px';
+      }
+      lastTap = now;
+    });
+
+    player.on('enterfullscreen', async () => {
+      try {
+        if (screen.orientation && screen.orientation.lock) {
+          await screen.orientation.lock('landscape');
+        }
+      } catch (err) {
+        console.warn('Auto-rotation not supported', err);
+      }
+      watermark.style.width = window.innerWidth < 768 ? '100px' : '120px';
+      watermark.style.bottom = '30px';
+      watermark.style.right = '60px';
+    });
+
+    player.on('exitfullscreen', async () => {
+      try {
+        if (screen.orientation && screen.orientation.unlock) {
+          await screen.orientation.unlock();
+        }
+      } catch (err) {
+        console.warn('Orientation unlock not supported', err);
+      }
+      adjustWatermark();
+    });
+  });
+};
+</script>
+
+<script>
+// Disable right-click
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// Block F12 / Ctrl+Shift+I / Ctrl+U with better detection
+document.addEventListener('keydown', e => {
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && e.shiftKey && (e.key.toUpperCase() === 'I' || e.key.toUpperCase() === 'J' || e.key.toUpperCase() === 'C')) ||
+    (e.ctrlKey && e.key.toUpperCase() === 'U')
+  ) {
+    e.preventDefault();
+    alert('⚠️ Developer tools are disabled for security reasons.');
+  }
+});
+
+// Optional small anti-bypass (blocks context menu via keyboard)
+window.addEventListener('keydown', e => {
+  if (e.key === 'ContextMenu' || e.key === 'Apps') e.preventDefault();
+});
+
+
+window.addEventListener('keydown', function(e) {
+  if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+    alert('🚫 Developer tools not allowed.');
+    window.close();
+  }
+});
+
+</script>
+
 
 <footer>
   &copy; 2025 
