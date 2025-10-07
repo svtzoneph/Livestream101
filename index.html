@@ -386,8 +386,6 @@ window.onload = function () {
       id: "player1",
       qualities: {
         480: "https://sin.media-delivery.net/mbc/tracks-v2a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..8rqQY1b4SKEZrhT1.RJ5XkofvpLosAyzc9JfWuwOrO7oGj7r94dM6o1Q-osbiUl8ppch6sec_fiTidALe4QSKJKJO_3Y3CzWo20DLoVudDmP1Fbr-dIbSRnKg7Mf6B8b7JEr-ipo1q10UYDBSiw7EUGO0lgloeFKZjvK3kQASgi7Oj-Anx9heZTEZD7kvnho9S4mMcv_gHhX0kp7vfdP7xWUHXnis_LE5ja932oi0DgVeZgrh66e8FDVWmIc-SVf2HmUqIQAH_rpEgN9JmeywoX4UU0gucG_8Hr6o384kLSWQXYOnmyf7c4s8_FfbBM0Lei1geJdQOBo2qbkeMNYuJCLk1AQZ5lxdDStRWCQvqV_F5hUZCQ4Pl5dPKGDhE1R3sAMKmVEUQyyWbqOIdfA664VEyWNodBRYQidBdoraucRHOfWFVRU53EKAXCGyNQGot65cix-dB0FzYXQtc9MxZSWiEWkOMTw5j-Rw_31xWa3C9liTjQHjeHOo32f69ICI6Ot_IGGG-uOVPqtdLwNfRihyaKIXR4VeEb-dZtOyweIfKuyPy4CGXUIa.wlRtanqfszmuVUag51lmKw&platformLanguage=en",
-        650: "https://live-edge-th136.myjktv.com/playlist/live.m3u8?sid=pXqN7CrT7GcBUVLPYPylbG4Sth1ZRyDiQFjdgVlo&secret=5155e57b1fcaf567e001a94d698464eb&time=1759805365",
-        720: "https://ns1.tjmbc.co.kr/live/myStream.sdp/playlist.m3u8",
         1080: "https://sin.media-delivery.net/mbc/tracks-v1a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..8rqQY1b4SKEZrhT1.RJ5XkofvpLosAyzc9JfWuwOrO7oGj7r94dM6o1Q-osbiUl8ppch6sec_fiTidALe4QSKJKJO_3Y3CzWo20DLoVudDmP1Fbr-dIbSRnKg7Mf6B8b7JEr-ipo1q10UYDBSiw7EUGO0lgloeFKZjvK3kQASgi7Oj-Anx9heZTEZD7kvnho9S4mMcv_gHhX0kp7vfdP7xWUHXnis_LE5ja932oi0DgVeZgrh66e8FDVWmIc-SVf2HmUqIQAH_rpEgN9JmeywoX4UU0gucG_8Hr6o384kLSWQXYOnmyf7c4s8_FfbBM0Lei1geJdQOBo2qbkeMNYuJCLk1AQZ5lxdDStRWCQvqV_F5hUZCQ4Pl5dPKGDhE1R3sAMKmVEUQyyWbqOIdfA664VEyWNodBRYQidBdoraucRHOfWFVRU53EKAXCGyNQGot65cix-dB0FzYXQtc9MxZSWiEWkOMTw5j-Rw_31xWa3C9liTjQHjeHOo32f69ICI6Ot_IGGG-uOVPqtdLwNfRihyaKIXR4VeEb-dZtOyweIfKuyPy4CGXUIa.wlRtanqfszmuVUag51lmKw&platformLanguage=en"
       },
       defaultQuality: 1080
@@ -457,9 +455,9 @@ window.onload = function () {
     watermark.src = 'https://uploads.onecompiler.io/43ddry4jt/43ymwg7hc/watermark.png';
     watermark.alt = 'Watermark';
     watermark.style.position = 'absolute';
-    watermark.style.bottom = '500px';
+    watermark.style.bottom = '20px';
     watermark.style.right = '40px';
-    watermark.style.width = '90px';
+    watermark.style.width = '80px';
     watermark.style.opacity = '0.8';
     watermark.style.pointerEvents = 'none';
     watermark.style.userSelect = 'none';
@@ -469,12 +467,12 @@ window.onload = function () {
     const adjustWatermark = () => {
       if (window.innerWidth < 768) {
         watermark.style.width = '60px';
-        watermark.style.bottom = '130px';
+        watermark.style.bottom = '15px';
         watermark.style.right = '30px';
         watermark.style.opacity = '0.9';
       } else {
         watermark.style.width = '80px';
-        watermark.style.bottom = '580px';
+        watermark.style.bottom = '15px';
         watermark.style.right = '60px';
         watermark.style.opacity = '0.8';
       }
@@ -503,8 +501,8 @@ window.onload = function () {
         console.warn('Auto-rotation not supported', err);
       }
       watermark.style.width = window.innerWidth < 768 ? '100px' : '120px';
-      watermark.style.bottom = '750px';
-      watermark.style.right = '70px';
+      watermark.style.bottom = '30px';
+      watermark.style.right = '60px';
     });
 
     player.on('exitfullscreen', async () => {
