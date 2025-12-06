@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Livestream101</title>
 
-<!-- Primary Meta Tags -->
 <title>LIVESTREAM101</title>
 <meta name="title" content="LIVESTREAM101">
 <meta name="description" content="">
 
-<!-- Open Graph (Facebook, Discord, LinkedIn, WhatsApp, Telegram, etc.) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livestream101.vercel.app/">
 <meta property="og:title" content="LIVESTREAM101">
@@ -19,15 +17,13 @@
 <meta property="og:site_name" content="LIVESTREAM101">
 <meta property="og:locale" content="en_PH">
 
-<!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://livestream101.vercel.app/">
 <meta name="twitter:title" content="LIVESTREAM101">
-<meta name="twitter:description" content="Watch 2025 Idol Star Athletics Championships ISAC for free ">
-<meta name="twitter:image" content="https://uploads.onecompiler.io/43ddry4jt/43yuf5762/2025isac.png">
+<meta name="twitter:description" content="[Part 1] 10th Anniversary Asia Artist Awards 2025 (10th AAA 2025)">
+<meta name="twitter:image" content="">
 <meta name="twitter:site" content="@101_livestream">
 
-<!-- HLS.js + Plyr -->
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
@@ -301,11 +297,8 @@ footer {
   </div>
 </header>
 
-<!-- Add this just before </body> -->
-<!-- About Button -->
 <button id="aboutBtn">About</button>
 
-<!-- About Modal -->
 <div id="aboutModal" class="modal">
   <div class="modal-content">
     <span class="close">&times;</span>
@@ -335,17 +328,24 @@ footer {
 
 <div class="video-container" id="videoPage">
 
-  <!-- Countdown Timer -->
   <div id="countdown" class="countdown">
     The stream will start at <span id="start-time"></span> — <span id="timer"></span>
   </div>
 
   <div class="videos">
     <div class="video-box">
-      <!-- ✅ Added thumbnail poster -->
-      <video id="player1" class="player" playsinline controls 
-        poster="https://uploads.onecompiler.io/43ddry4jt/43yuf5762/2025isac.png"></video>
-      <h4 class="video-label">[PART 3] 2025 Idol Star Athletics Championships</h4>
+      <video id="player1" class="player" playsinline controls crossorigin
+        poster="">
+        
+        <track 
+          kind="captions" 
+          label="English" 
+          srclang="en" 
+          src="https://livecloud.akamaized.net/weverse/lip2_sg/snmss0008/mpsur4eqgddvgpukwjnmqw5186dr3vs4go/subeng/hdntl=exp=1765034720~acl=*%2fmpsur4eqgddvgpukwjnmqw5186dr3vs4go%2f*~data=hdntl~hmac=1207d40506a7cbadf68f03e19c007143131e87ac65a21914e110a7eecd567eb1/subeng_3042663854_1765002570547_2690_0_897.vtt?bitrate=43&filetype=.vtt"
+          default
+        >
+      </video>
+      <h4 class="video-label">[Part 1] 10th Anniversary Asia Artist Awards 2025 (10th AAA 2025)</h4>
     </div>
   </div>
 </div>
@@ -407,9 +407,9 @@ window.onload = function () {
     {
       id: "player1",
       qualities: {
-        480: "https://sin.media-delivery.net/mbc/tracks-v2a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..ZG2a9ZdK4iwTq3s-.V0p7RsZe2UZ3ouj0t2qUNLR4loJqFReF2vzYX7x7oZBr3ydJCOkH1jiscGGvG3XO8myXwxwH9utFGffq0ShTCrWtqBVgC2TjtX8Rb7WSSDEfT5DFiTpkGbw8xqr712gnGKhxXVqRu-x_9hwfHQxEJ_LnD4YTJ1TogFkF44_eOpOIvaWV5HrufwzM6Tp_rpX_lnnD7xI0Fd38iXvvpZbgRzdOcWG59PoZAgJwBXNu2kgKy5Ysuj43uNVTL36PufzjZPH16tgD751rhN9QlnBo3eFTVkmQTabnoiEyxUOSjosQpgpVr3WXyRMhWPcKBAwiS-Fd-JtPaw7H79Q2AqcosyM7Dm7ETZ-kBN4ixywkt5tkybZ6e_ta5IgUzw3yU_eyv1dtV5axySojCHKLKBBurK5EuEn5njjjCQBsYPjtHqEIBB6-iOKmuOl6PO7_oeZlvAubvHFEb7RFdrzKZnHEyct9GT4R4EQTUOMKgx3nXBI0NcSB9pvMWm_WsRMfOjs4cT5d3n-NRbppBTacbLh5U0TVoxonlwH6aTDodp-T.eXCH_t0TKnZt7NVCJRENRA&platformLanguage=en",
-       780: "https://sin.media-delivery.net/mbc/tracks-v1a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..ZG2a9ZdK4iwTq3s-.V0p7RsZe2UZ3ouj0t2qUNLR4loJqFReF2vzYX7x7oZBr3ydJCOkH1jiscGGvG3XO8myXwxwH9utFGffq0ShTCrWtqBVgC2TjtX8Rb7WSSDEfT5DFiTpkGbw8xqr712gnGKhxXVqRu-x_9hwfHQxEJ_LnD4YTJ1TogFkF44_eOpOIvaWV5HrufwzM6Tp_rpX_lnnD7xI0Fd38iXvvpZbgRzdOcWG59PoZAgJwBXNu2kgKy5Ysuj43uNVTL36PufzjZPH16tgD751rhN9QlnBo3eFTVkmQTabnoiEyxUOSjosQpgpVr3WXyRMhWPcKBAwiS-Fd-JtPaw7H79Q2AqcosyM7Dm7ETZ-kBN4ixywkt5tkybZ6e_ta5IgUzw3yU_eyv1dtV5axySojCHKLKBBurK5EuEn5njjjCQBsYPjtHqEIBB6-iOKmuOl6PO7_oeZlvAubvHFEb7RFdrzKZnHEyct9GT4R4EQTUOMKgx3nXBI0NcSB9pvMWm_WsRMfOjs4cT5d3n-NRbppBTacbLh5U0TVoxonlwH6aTDodp-T.eXCH_t0TKnZt7NVCJRENRA&platformLanguage=en",
-        1080: "https://sin.media-delivery.net/mbc/tracks-v1a1/mono.m3u8?token=eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..ZG2a9ZdK4iwTq3s-.V0p7RsZe2UZ3ouj0t2qUNLR4loJqFReF2vzYX7x7oZBr3ydJCOkH1jiscGGvG3XO8myXwxwH9utFGffq0ShTCrWtqBVgC2TjtX8Rb7WSSDEfT5DFiTpkGbw8xqr712gnGKhxXVqRu-x_9hwfHQxEJ_LnD4YTJ1TogFkF44_eOpOIvaWV5HrufwzM6Tp_rpX_lnnD7xI0Fd38iXvvpZbgRzdOcWG59PoZAgJwBXNu2kgKy5Ysuj43uNVTL36PufzjZPH16tgD751rhN9QlnBo3eFTVkmQTabnoiEyxUOSjosQpgpVr3WXyRMhWPcKBAwiS-Fd-JtPaw7H79Q2AqcosyM7Dm7ETZ-kBN4ixywkt5tkybZ6e_ta5IgUzw3yU_eyv1dtV5axySojCHKLKBBurK5EuEn5njjjCQBsYPjtHqEIBB6-iOKmuOl6PO7_oeZlvAubvHFEb7RFdrzKZnHEyct9GT4R4EQTUOMKgx3nXBI0NcSB9pvMWm_WsRMfOjs4cT5d3n-NRbppBTacbLh5U0TVoxonlwH6aTDodp-T.eXCH_t0TKnZt7NVCJRENRA&platformLanguage=en"
+        480: "https://livecloud.akamaized.net/weverse/lip2_sg/snmss0008/mpsur4eqgddvgpukwjnmqw5186dr3vs4go/2500.stream/hdntl=exp=1765035478~acl=*%2fmpsur4eqgddvgpukwjnmqw5186dr3vs4go%2f*~data=hdntl~hmac=c38a889441296072f55a26e22b0cb3318d05d39adee327221ca145ce010d510d/chunklist.m3u8",
+        780: "https://livecloud.akamaized.net/weverse/lip2_sg/snmss0008/mpsur4eqgddvgpukwjnmqw5186dr3vs4go/2500.stream/hdntl=exp=1765035390~acl=*%2fmpsur4eqgddvgpukwjnmqw5186dr3vs4go%2f*~data=hdntl~hmac=ea1a458ad470dbc621bb12f48f7c0cf4f53131b40cd235ee71c487c85083533c/chunklist.m3u8",
+        1080: "https://livecloud.akamaized.net/weverse/lip2_sg/snmss0008/mpsur4eqgddvgpukwjnmqw5186dr3vs4go/playlist.m3u8?hdnts=st=1765002273~exp=1765034683~acl=*/mpsur4eqgddvgpukwjnmqw5186dr3vs4go/*~hmac=c82c7ea4338ee6f70b71e83fe8bf923b81be48fa769a3934a288dd7d8ddf1be7"
       },
       defaultQuality: 1080
     }
@@ -475,8 +475,8 @@ window.onload = function () {
 
     /* WATERMARK */
     const watermark = document.createElement('img');
-    watermark.src = 'https://uploads.onecompiler.io/43ddry4jt/43ymwg7hc/watermark.png';
-    watermark.alt = 'Watermark';
+    watermark.src = '';
+    watermark.alt = '';
     watermark.style.position = 'absolute';
     watermark.style.bottom = '20px';
     watermark.style.right = '40px';
