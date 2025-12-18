@@ -89,7 +89,7 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 10px;
+  padding: 20px 10px; /* Margins kept for Portrait Mode */
   gap: 20px;
   color: white;
   width: 100%;
@@ -109,7 +109,7 @@ header {
   align-items: center;
   background: #181818;
   padding: 0;
-  border-radius: 10px;
+  border-radius: 10px; /* Rounded corners in Portrait */
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   position: relative;
   width: 100%;
@@ -146,10 +146,9 @@ header {
   font-size: 1.2rem;
   font-weight: 600;
   color: var(--accent);
-  margin-bottom: 5px; /* Reduced to make room for note */
+  margin-bottom: 5px; 
 }
 
-/* NEW: Timer Note Style */
 .timer-note {
   font-size: 0.9rem;
   color: #888;
@@ -191,6 +190,43 @@ header {
   font-weight: 900;
   color: #fff;
   margin-top: -5px; 
+}
+
+/* Loading Overlay Styles (Gray) */
+.custom-loading {
+  position: absolute;
+  top: 0; 
+  left: 0; 
+  width: 100%; 
+  height: 100%;
+  background: rgba(50, 50, 50, 0.7); /* Gray semi-transparent */
+  display: flex; 
+  justify-content: center; 
+  align-items: center;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  visibility: hidden;
+}
+
+.custom-loading.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(200, 200, 200, 0.3);
+  border-top: 5px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @media screen and (max-width: 480px) {
@@ -241,14 +277,39 @@ header {
 }
 
 @media screen and (max-width: 768px) {
+  /* On Mobile Portrait: Keep margins so it looks like a box */
+  .videos {
+    width: 100%; 
+    gap: 15px;
+  }
+
   .video-box .watermark {
     font-size: 4vw;
     top: 5%;
     left: 5%;
   }
-  .videos, .lineup-box {
-    width: 100%; 
-  }
+}
+
+/* LANDSCAPE / FULLSCREEN MODE STYLES */
+.plyr--fullscreen {
+  border-radius: 0 !important;
+  margin: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: none !important;
+  max-height: none !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: #000 !important;
+  position: fixed !important;
+  z-index: 100000 !important;
+}
+
+.plyr--fullscreen .custom-loading {
+  width: 100vw;
+  height: 100vh;
 }
 
 .player {
@@ -422,7 +483,9 @@ footer {
       - …and more!<br><br>
 
       If you have a request, just send us a message on our 
-      <a href="https://x.com/101_livestream" target="_blank"><strong>X account</strong></a>.<br><br
+      <a href="https://x.com/101_livestream" target="_blank"><strong>X account</strong></a>.<br><br>
+
+      Enjoy your favorite shows anytime, anywhere, for free!
     </p>
   </div>
 </div>
@@ -433,6 +496,10 @@ footer {
 
   <div class="videos">
     <div class="video-box">
+      <div id="loadingOverlay" class="custom-loading">
+        <div class="spinner"></div>
+      </div>
+
       <video id="player1" class="player" playsinline controls crossorigin
         poster="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/Lineup-KBS-Global-Festival-2025-2048x1366.webp">
       </video>
@@ -554,14 +621,29 @@ window.onload = function () {
     const video = document.getElementById(src.id);
     if (!video) return;
 
+    // Loading overlay logic
+    const overlay = document.getElementById('loadingOverlay');
+    
+    function showLoading() { overlay.classList.add('active'); }
+    function hideLoading() { overlay.classList.remove('active'); }
+
+    // Event listeners for buffering/loading states
+    video.addEventListener('waiting', showLoading);
+    video.addEventListener('loadstart', showLoading);
+    video.addEventListener('canplay', hideLoading);
+    video.addEventListener('playing', hideLoading);
+    video.addEventListener('pause', hideLoading);
+    video.addEventListener('error', hideLoading);
+
     let hls;
     let currentQuality = src.defaultQuality;
 
     function loadStream(quality) {
+      showLoading(); 
       const streamUrl = src.qualities[quality];
       if (!streamUrl) return;
 
-      if (hls) hls.destroy(); // destroy previous instance
+      if (hls) hls.destroy(); 
       hls = new Hls({ capLevelToPlayerSize: true });
       hls.loadSource(streamUrl);
       hls.attachMedia(video);
@@ -571,6 +653,11 @@ window.onload = function () {
           video.muted = true;
           video.play();
         });
+        hideLoading(); 
+      });
+
+      hls.on(Hls.Events.ERROR, function() {
+         // handle error
       });
     }
 
@@ -598,9 +685,11 @@ window.onload = function () {
     });
 
     // Initial load
-    if (Hls.isSupported()) loadStream(currentQuality);
-    else if (video.canPlayType("application/vnd.apple.mpegurl")) {
+    if (Hls.isSupported()) {
+        loadStream(currentQuality);
+    } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src.qualities[currentQuality];
+      video.addEventListener('loadedmetadata', hideLoading);
       video.play();
     }
 
@@ -646,6 +735,9 @@ window.onload = function () {
       lastTap = now;
     });
 
+    // --- LANDSCAPE / FULLSCREEN AUTOMATION ---
+    
+    // 1. Force Landscape on Fullscreen Click
     player.on('enterfullscreen', async () => {
       try {
         if (screen.orientation && screen.orientation.lock) {
@@ -654,6 +746,7 @@ window.onload = function () {
       } catch (err) {
         console.warn('Auto-rotation not supported', err);
       }
+      // Adjust watermark for landscape
       watermark.style.width = window.innerWidth < 768 ? '100px' : '120px';
       watermark.style.bottom = '30px';
       watermark.style.right = '60px';
@@ -669,6 +762,39 @@ window.onload = function () {
       }
       adjustWatermark();
     });
+
+    // 2. Listen for Physical Device Rotation
+    // If device rotates to landscape -> Enter Fullscreen
+    // If device rotates to portrait -> Exit Fullscreen
+    if (window.screen && window.screen.orientation) {
+       window.screen.orientation.addEventListener('change', () => {
+          const type = window.screen.orientation.type;
+          if (type.includes('landscape')) {
+              if (!player.fullscreen.active) {
+                 player.fullscreen.enter().catch(() => {});
+              }
+          } else if (type.includes('portrait')) {
+              if (player.fullscreen.active) {
+                 player.fullscreen.exit();
+              }
+          }
+       });
+    }
+
+    // Fallback for older devices (window.orientation)
+    window.addEventListener("orientationchange", function() {
+      // 90 or -90 is usually landscape
+      if (window.orientation === 90 || window.orientation === -90) {
+         if (!player.fullscreen.active) {
+             player.fullscreen.enter().catch(() => {});
+         }
+      } else {
+         if (player.fullscreen.active) {
+             player.fullscreen.exit();
+         }
+      }
+    });
+
   });
 };
 </script>
