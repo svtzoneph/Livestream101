@@ -5,9 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Livestream101</title>
 
-<title>LIVESTREAM101</title>
 <meta name="title" content="LIVESTREAM101">
-<meta name="description" content="">
+<meta name="description" content="Watch K-Contents for free">
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://livestream101.vercel.app/">
@@ -45,6 +44,11 @@ body {
   min-height: 100vh;
    user-select: none;
   -webkit-user-select: none;
+  box-sizing: border-box;
+}
+
+*, *:before, *:after {
+  box-sizing: inherit;
 }
 
 .video-container {
@@ -79,36 +83,24 @@ header {
   border-radius: 6px;
 }
 
-/* Countdown timer */
-.countdown {
-  font-size: 1.2rem;
-  background: #181818;
-  padding: 12px 24px;
-  border-radius: 10px;
-  color: #fff;
-  text-align: center;
-  margin-bottom: 15px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.4);
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
 
 /* Video container */
 .video-container {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 30px 20px;
+  padding: 20px 10px;
   gap: 20px;
   color: white;
+  width: 100%;
 }
 
 .videos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: 1fr;
   gap: 30px;
-  width: 100%;
-  max-width: 1200px;
+  width: 95%;
+  max-width: 900px;
 }
 
 .video-box {
@@ -116,10 +108,118 @@ header {
   flex-direction: column;
   align-items: center;
   background: #181818;
-  padding: 10px;
+  padding: 0;
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Lineup Box Styles */
+.lineup-box {
+  width: 95%;
+  max-width: 900px;
+  background: #181818;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  text-align: center;
+  margin-top: 5px; 
+}
+
+.schedule-section {
+  border-bottom: 1px solid #333;
+  padding-bottom: 20px;
+  margin-bottom: 20px;
+}
+
+.schedule-date {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 1px;
+  margin-bottom: 5px;
+}
+
+.schedule-time {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 5px; /* Reduced to make room for note */
+}
+
+/* NEW: Timer Note Style */
+.timer-note {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+/* Countdown Styles */
+.schedule-timer-container {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.timer-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.timer-number {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+
+.timer-label {
+  font-size: 0.8rem;
+  color: #aaa;
+  text-transform: uppercase;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+.timer-separator {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #fff;
+  margin-top: -5px; 
+}
+
+@media screen and (max-width: 480px) {
+  .timer-number { font-size: 1.8rem; }
+  .timer-label { font-size: 0.7rem; }
+  .schedule-timer-container { gap: 10px; }
+}
+
+.lineup-title {
+  color: #ddd; 
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.lineup-list {
+  color: #ccc;
+  font-size: 1rem;
+  line-height: 1.8;
+  font-weight: 500;
+}
+
+.dot-separator {
+  color: #555;
+  margin: 0 8px;
+  font-size: 0.8rem;
+  vertical-align: middle;
 }
 
 /* Watermark */
@@ -146,17 +246,20 @@ header {
     top: 5%;
     left: 5%;
   }
+  .videos, .lineup-box {
+    width: 100%; 
+  }
 }
 
 .player {
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 8px;
   background: #000;
 }
 
 .video-label {
   margin-top: 10px;
+  margin-bottom: 10px;
   font-size: 16px;
   color: #ccc;
   text-align: center;
@@ -199,11 +302,11 @@ footer {
   bottom: 20px;
   right: 20px;
   z-index: 9999;
-  background:linear-gradient(to bottom, #000000, #1a1a1a); /* Same as your website accent */
+  background:linear-gradient(to bottom, #000000, #1a1a1a);
   color: #fff;
   border: none;
   padding: 12px 18px;
-  border-radius: 50px; /* Rounded pill shape */
+  border-radius: 50px;
   font-weight: bold;
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
@@ -217,7 +320,7 @@ footer {
 
 /* Modal Styles */
 .modal {
-  display: none; /* Hidden by default */
+  display: none;
   position: fixed;
   z-index: 10000;
   left: 0;
@@ -319,85 +422,119 @@ footer {
       - …and more!<br><br>
 
       If you have a request, just send us a message on our 
-      <a href="https://x.com/101_livestream" target="_blank"><strong>X account</strong></a>.<br><br>
-
-      Enjoy your favorite shows anytime, anywhere, for free!
+      <a href="https://x.com/101_livestream" target="_blank"><strong>X account</strong></a>.<br><br
     </p>
   </div>
 </div>
 
 <div class="video-container" id="videoPage">
 
-  <div id="countdown" class="countdown">
-    The stream will start at <span id="start-time"></span> — <span id="timer"></span>
-  </div>
+  <div id="countdown" class="countdown" style="display:none;"></div>
 
   <div class="videos">
     <div class="video-box">
       <video id="player1" class="player" playsinline controls crossorigin
-        poster="">
-        
-        <track 
-          kind="captions" 
-          label="English" 
-          srclang="en" 
-          src="https://livecloud.akamaized.net/weverse/lip2_sg/snmss0008/mpsur4eqgddvgpukwjnmqw5186dr3vs4go/subeng/hdntl=exp=1765034720~acl=*%2fmpsur4eqgddvgpukwjnmqw5186dr3vs4go%2f*~data=hdntl~hmac=1207d40506a7cbadf68f03e19c007143131e87ac65a21914e110a7eecd567eb1/subeng_3042663854_1765002570547_2690_0_897.vtt?bitrate=43&filetype=.vtt"
-          default
-        >
+        poster="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/Lineup-KBS-Global-Festival-2025-2048x1366.webp">
       </video>
-      <h4 class="video-label">The Shadow's Edge</h4>
+      <h4 class="video-label">2025 KBS Gayo Daechukje</h4>
+    </div>
+  </div>
+
+  <div class="lineup-box">
+    <div class="schedule-section">
+      <div class="schedule-date">DECEMBER 19, 2025</div>
+      <div class="schedule-time">7:15PM KST | 6:15 PM PHT</div>
+      
+      <div class="timer-note">Note: The timer below is based on PHT time.</div>
+      
+      <div class="schedule-timer-container" id="scheduleTimer">
+        <div class="timer-block">
+          <span class="timer-number" id="t-days">00</span>
+          <span class="timer-label">Days</span>
+        </div>
+        <div class="timer-separator">:</div>
+        <div class="timer-block">
+          <span class="timer-number" id="t-hours">00</span>
+          <span class="timer-label">Hours</span>
+        </div>
+        <div class="timer-separator">:</div>
+        <div class="timer-block">
+          <span class="timer-number" id="t-minutes">00</span>
+          <span class="timer-label">Minutes</span>
+        </div>
+        <div class="timer-separator">:</div>
+        <div class="timer-block">
+          <span class="timer-number" id="t-seconds">00</span>
+          <span class="timer-label">Seconds</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="lineup-title">2025 KBS Gayo Daechukje Line Up</div>
+    <div class="lineup-list">
+      NCT DREAM <span class="dot-separator">•</span> 
+      MARK <span class="dot-separator">•</span> 
+      HAECHAN <span class="dot-separator">•</span> 
+      AHOF <span class="dot-separator">•</span> 
+      P1HARMONY <span class="dot-separator">•</span> 
+      THE BOYZ <span class="dot-separator">•</span> 
+      tripleS <span class="dot-separator">•</span> 
+      aespa <span class="dot-separator">•</span> 
+      LE SSERAFIM <span class="dot-separator">•</span> 
+      KISS OF LIFE <span class="dot-separator">•</span> 
+      n.SSign <span class="dot-separator">•</span> 
+      EVNNE <span class="dot-separator">•</span> 
+      CLOSE YOUR EYES <span class="dot-separator">•</span> 
+      HITGS <span class="dot-separator">•</span> 
+      Baby DONT Cry <span class="dot-separator">•</span> 
+      fromis_9 <span class="dot-separator">•</span> 
+      STAYC <span class="dot-separator">•</span> 
+      LOVELYZ <span class="dot-separator">•</span> 
+      DAYOUNG <span class="dot-separator">•</span> 
+      CNBLUE <span class="dot-separator">•</span> 
+      LEE CHANWON <span class="dot-separator">•</span> 
+      PARK SEOJIN <span class="dot-separator">•</span> 
+      10CM <span class="dot-separator">•</span> 
+      ROY KIM <span class="dot-separator">•</span> 
+      JANNABI
     </div>
   </div>
 </div>
 
 <script>
-/* Countdown Timer Section */
-const countdownElement = document.getElementById("countdown");
-const timerElement = document.getElementById("timer");
-const startTimeDisplay = document.getElementById("start-time");
+(function() {
+  const dayElem = document.getElementById('t-days');
+  const hourElem = document.getElementById('t-hours');
+  const minElem = document.getElementById('t-minutes');
+  const secElem = document.getElementById('t-seconds');
+  const timerContainer = document.getElementById('scheduleTimer');
 
-// 🕒 Set your stream start time here (Philippine time)
-const streamStart = new Date("2025-10-08T16:45:00+08:00"); // Example: 8:15 PM PHT
+  // Set the date we're counting down to (PHT is UTC+8)
+  // Dec 19, 2025, 6:15 PM PHT
+  const countDownDate = new Date("2025-12-19T18:15:00+08:00").getTime();
 
-// Display formatted start time
-startTimeDisplay.textContent = streamStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+  const updateTimer = setInterval(function() {
+    const now = new Date().getTime();
+    const distance = countDownDate - now;
 
-// Check if already refreshed before
-const hasRefreshed = localStorage.getItem("streamRefreshed");
-const now = new Date();
-
-if (now >= streamStart) {
-  // If user opens after stream start, show LIVE message and do not refresh
-  countdownElement.innerHTML = "LIVE NOW!";
-} else {
-  const timerInterval = setInterval(() => {
-    const now = new Date();
-    const distance = streamStart - now;
-
-    if (distance <= 0) {
-      clearInterval(timerInterval);
-
-      // Only refresh once
-      if (!hasRefreshed) {
-        countdownElement.innerHTML = "🚀 Starting the stream...";
-        localStorage.setItem("streamRefreshed", "true");
-
-        setTimeout(() => {
-          location.reload();
-        }, 2000);
-      } else {
-        countdownElement.innerHTML = "LIVE NOW!";
-      }
-
-    } else {
-      const hours = Math.floor((distance / (1000 * 60 * 60)) % 24);
-      const minutes = Math.floor((distance / (1000 * 60)) % 60);
-      const seconds = Math.floor((distance / 1000) % 60);
-      timerElement.textContent = `${hours.toString().padStart(2,'0')}:${minutes
-        .toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    if (distance < 0) {
+      clearInterval(updateTimer);
+      timerContainer.innerHTML = "<div style='font-size:1.5rem; font-weight:bold; color:#3ea6ff;'></div>";
+      return;
     }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    dayElem.innerHTML = days;
+    hourElem.innerHTML = hours.toString().padStart(2, '0');
+    minElem.innerHTML = minutes.toString().padStart(2, '0');
+    secElem.innerHTML = seconds.toString().padStart(2, '0');
+
   }, 1000);
-}
+})();
 </script>
 
 <script>
@@ -407,7 +544,7 @@ window.onload = function () {
     {
       id: "player1",
       qualities: {
-        1080: "https://live-hz-12.livepush.io/live/emoYLFyCdHZTEtea/playlist.m3u8?session_id=7723167865647396",
+        1080: "https://k227.jk-cdn.com/playlist/live.m3u8?sid=COemVIdRzRxqzki2kALv3sBQCP62Mseq6UViBsfV&secret=6a0ffa4f0ad7722f12911f491bced305&time=1766033511",
       },
       defaultQuality: 1080
     }
@@ -444,11 +581,7 @@ window.onload = function () {
       controls: [
         "play-large",
         "play",
-        "current-time",
         "mute",
-        "volume",
-        "captions",
-        "settings",
         "airplay",
         "fullscreen"
       ],
