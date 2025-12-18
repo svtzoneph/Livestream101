@@ -12,15 +12,15 @@
 <meta property="og:url" content="https://livestream101.vercel.app/">
 <meta property="og:title" content="LIVESTREAM101">
 <meta property="og:description" content="Watch K-Contents for free">
-<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/43yuf5762/2025isac.png">
+<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/Lineup-KBS-Global-Festival-2025-2048x1366.webp">
 <meta property="og:site_name" content="LIVESTREAM101">
 <meta property="og:locale" content="en_PH">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://livestream101.vercel.app/">
 <meta name="twitter:title" content="LIVESTREAM101">
-<meta name="twitter:description" content="[Part 1] 10th Anniversary Asia Artist Awards 2025 (10th AAA 2025)">
-<meta name="twitter:image" content="">
+<meta name="twitter:description" content="2025 KBS Gayo Daechukje">
+<meta name="twitter:image" content="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/Lineup-KBS-Global-Festival-2025-2048x1366.webp">
 <meta name="twitter:site" content="@101_livestream">
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -89,7 +89,7 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px 10px; /* Margins kept for Portrait Mode */
+  padding: 20px 10px; /* Default margin for Portrait */
   gap: 20px;
   color: white;
   width: 100%;
@@ -109,7 +109,7 @@ header {
   align-items: center;
   background: #181818;
   padding: 0;
-  border-radius: 10px; /* Rounded corners in Portrait */
+  border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   position: relative;
   width: 100%;
@@ -192,43 +192,6 @@ header {
   margin-top: -5px; 
 }
 
-/* Loading Overlay Styles (Gray) */
-.custom-loading {
-  position: absolute;
-  top: 0; 
-  left: 0; 
-  width: 100%; 
-  height: 100%;
-  background: rgba(50, 50, 50, 0.7); /* Gray semi-transparent */
-  display: flex; 
-  justify-content: center; 
-  align-items: center;
-  z-index: 20;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  visibility: hidden;
-}
-
-.custom-loading.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.spinner {
-  width: 50px;
-  height: 50px;
-  border: 5px solid rgba(200, 200, 200, 0.3);
-  border-top: 5px solid var(--accent);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 @media screen and (max-width: 480px) {
   .timer-number { font-size: 1.8rem; }
   .timer-label { font-size: 0.7rem; }
@@ -277,7 +240,6 @@ header {
 }
 
 @media screen and (max-width: 768px) {
-  /* On Mobile Portrait: Keep margins so it looks like a box */
   .videos {
     width: 100%; 
     gap: 15px;
@@ -291,6 +253,7 @@ header {
 }
 
 /* LANDSCAPE / FULLSCREEN MODE STYLES */
+/* This forces YouTube-style fullscreen ONLY when actual fullscreen is active */
 .plyr--fullscreen {
   border-radius: 0 !important;
   margin: 0 !important;
@@ -305,11 +268,6 @@ header {
   background: #000 !important;
   position: fixed !important;
   z-index: 100000 !important;
-}
-
-.plyr--fullscreen .custom-loading {
-  width: 100vw;
-  height: 100vh;
 }
 
 .player {
@@ -496,10 +454,6 @@ footer {
 
   <div class="videos">
     <div class="video-box">
-      <div id="loadingOverlay" class="custom-loading">
-        <div class="spinner"></div>
-      </div>
-
       <video id="player1" class="player" playsinline controls crossorigin
         poster="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/Lineup-KBS-Global-Festival-2025-2048x1366.webp">
       </video>
@@ -621,25 +575,10 @@ window.onload = function () {
     const video = document.getElementById(src.id);
     if (!video) return;
 
-    // Loading overlay logic
-    const overlay = document.getElementById('loadingOverlay');
-    
-    function showLoading() { overlay.classList.add('active'); }
-    function hideLoading() { overlay.classList.remove('active'); }
-
-    // Event listeners for buffering/loading states
-    video.addEventListener('waiting', showLoading);
-    video.addEventListener('loadstart', showLoading);
-    video.addEventListener('canplay', hideLoading);
-    video.addEventListener('playing', hideLoading);
-    video.addEventListener('pause', hideLoading);
-    video.addEventListener('error', hideLoading);
-
     let hls;
     let currentQuality = src.defaultQuality;
 
     function loadStream(quality) {
-      showLoading(); 
       const streamUrl = src.qualities[quality];
       if (!streamUrl) return;
 
@@ -653,11 +592,6 @@ window.onload = function () {
           video.muted = true;
           video.play();
         });
-        hideLoading(); 
-      });
-
-      hls.on(Hls.Events.ERROR, function() {
-         // handle error
       });
     }
 
@@ -689,7 +623,6 @@ window.onload = function () {
         loadStream(currentQuality);
     } else if (video.canPlayType("application/vnd.apple.mpegurl")) {
       video.src = src.qualities[currentQuality];
-      video.addEventListener('loadedmetadata', hideLoading);
       video.play();
     }
 
@@ -746,7 +679,6 @@ window.onload = function () {
       } catch (err) {
         console.warn('Auto-rotation not supported', err);
       }
-      // Adjust watermark for landscape
       watermark.style.width = window.innerWidth < 768 ? '100px' : '120px';
       watermark.style.bottom = '30px';
       watermark.style.right = '60px';
@@ -764,8 +696,6 @@ window.onload = function () {
     });
 
     // 2. Listen for Physical Device Rotation
-    // If device rotates to landscape -> Enter Fullscreen
-    // If device rotates to portrait -> Exit Fullscreen
     if (window.screen && window.screen.orientation) {
        window.screen.orientation.addEventListener('change', () => {
           const type = window.screen.orientation.type;
