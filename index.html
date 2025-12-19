@@ -1,664 +1,919 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
-<title>Livestream101</title>
+<meta charset="UTF-8">
+<title>Live | Zone Vault</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 
-<meta name="title" content="LIVESTREAM101">
-<meta name="description" content="Watch K-Contents for free">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://livestream101.vercel.app/">
-<meta property="og:title" content="LIVESTREAM101">
-<meta property="og:description" content="Watch K-Contents for free">
-<meta property="og:image" content="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/This%20live%20event%20has%20ended..png">
-<meta property="og:site_name" content="LIVESTREAM101">
-<meta property="og:locale" content="en_PH">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:url" content="https://livestream101.vercel.app/">
-<meta name="twitter:title" content="LIVESTREAM101">
-<meta name="twitter:description" content="2025 KBS Gayo Daechukje">
-<meta name="twitter:image" content="">
-<meta name="twitter:site" content="@101_livestream">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+
+<link rel="icon" href="favicon-new.png" type="image/png" />
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+
+<meta name="apple-mobile-web-app-title" content="Zone Vault">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
+<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
+<link rel="apple-touch-startup-image" href="splash.png">
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-1B2RJ659GL');
+</script>
+
+<script>
+  (function() {
+    const savedTheme = localStorage.getItem('zoneVaultTheme');
+    if(savedTheme) {
+      const style = document.createElement('style');
+      style.innerHTML = `
+        body { 
+          background: ${savedTheme} !important; 
+          background-size: cover !important;
+          background-attachment: fixed !important;
+          background-repeat: no-repeat !important;
+          min-height: 100vh;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+  })();
+</script>
 
 <style>
-:root {
-  --bg: #0f0f0f;
-  --text: #fff;
-  --accent: #3ea6ff;
-  --heart-color: #ff4081;
-}
+  /* --- CSS VARIABLES --- */
+  :root {
+      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
+      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      --glass-blur: blur(20px);
+      --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+      --plyr-color-main: #ff0033; /* Red Accent */
+  }
 
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
-  background-color: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-   user-select: none;
-  -webkit-user-select: none;
-  box-sizing: border-box;
-}
+  * { box-sizing: border-box; }
 
-*, *:before, *:after {
-  box-sizing: inherit;
-}
-
-/* Header */
-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background: #181818;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.logo { font-size: 1.6rem; font-weight: 900; }
-.search-bar input {
-  width: 100%;
-  max-width: 300px;
-  padding: 8px;
-  border: none;
-  background: #121212;
-  color: #fff;
-  border-radius: 6px;
-}
-
-/* Main Layout */
-.video-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 10px;
-  gap: 20px;
-  color: white;
-  width: 100%;
-  flex: 1;
-}
-
-.videos {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 15px;
-  width: 95%;
-  max-width: 900px;
-}
-
-/* VIDEO BOX */
-.video-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #181818;
-  padding: 0;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  position: relative;
-  width: 100%;
-  overflow: hidden;
-}
-
-.player {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  background: #000;
-  display: block;
-}
-
-.video-label {
-  margin: 15px 0;
-  font-size: 18px;
-  color: #fff;
-  text-align: center;
-  font-weight: 600;
-}
-
-/* --- OVERLAYS INSIDE VIDEO (Top Left) --- */
-.video-overlay-container {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  z-index: 2147483647; 
-  background: rgba(0, 0, 0, 0.6);
-  padding: 8px 14px;
-  border-radius: 20px;
-  pointer-events: none; 
-  backdrop-filter: blur(4px);
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #fff;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-}
-
-.stat-item svg {
-  width: 18px;
-  height: 18px;
-  fill: #fff;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
-}
-
-
-/* --- UPDATED REALISTIC FLOATING HEARTS ANIMATION --- */
-#floatingHeartsContainer {
-    position: absolute;
-    top: 0;
-    left: 0;
+  html, body {
     width: 100%;
-    height: 90%; /* Go slightly higher */
-    pointer-events: none;
-    z-index: 20;
-    overflow: hidden;
-}
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
 
-.floating-heart {
-    position: absolute;
-    bottom: -20px; /* Start slightly below view */
-    /* Default values, overridden by JS */
-    --fly-duration: 3s;
-    --fly-distance: -400px;
-    --rotation-end: 360deg;
-    --scale-start: 0.5;
-    --scale-end: 1.5;
-    --wobble-dir: 30px;
-    
-    color: var(--heart-color);
-    opacity: 0;
-    will-change: transform, opacity; /* Performance optimization */
-    animation: floatUpRealistic var(--fly-duration) ease-out forwards;
-    filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
-}
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: black; 
+    text-align: center;
+    padding-top: 20px; 
+    padding-bottom: 20px;
+    transition: background 0.5s ease;
+  }
 
-@keyframes floatUpRealistic {
-    0% {
-        transform: translateY(0) translateX(0) scale(var(--scale-start)) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.8; /* Fade in quickly */
-    }
-    33% {
-        /* Drift one way */
-        transform: translateY(calc(var(--fly-distance) * 0.33)) translateX(calc(var(--wobble-dir) * -1)) scale(0.9) rotate(calc(var(--rotation-end) * 0.33));
-    }
-    66% {
-         /* Drift other way */
-        transform: translateY(calc(var(--fly-distance) * 0.66)) translateX(var(--wobble-dir)) scale(1.2) rotate(calc(var(--rotation-end) * 0.66));
-        opacity: 1;
-    }
-    100% {
-        /* End point: high up, tumbled, large, faded out */
-        transform: translateY(var(--fly-distance)) translateX(calc(var(--wobble-dir) * 0.5)) scale(var(--scale-end)) rotate(var(--rotation-end));
-        opacity: 0;
-    }
-}
-
-
-/* --- BELOW VIDEO ACTIONS --- */
-.below-video-actions {
-  width: 95%;
-  max-width: 900px;
-  display: flex;
-  justify-content: space-between; 
-  align-items: center;
-  padding: 10px 5px;
-}
-
-.left-stats-display {
-    display: flex;
-    gap: 20px;
+  /* --- MODAL STYLES --- */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(15px);
+    z-index: 99999; /* Highest priority */
+    display: flex; /* Hidden via JS later */
     align-items: center;
-}
-
-.text-stat {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #ccc;
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-.text-stat strong {
-    color: #fff;
-    font-size: 1.1rem;
-}
-
-.heart-spam-container {
-    display: flex;
-    align-items: center;
-    background: #272727;
-    padding: 8px 12px;
-    border-radius: 30px;
-    border: 1px solid #333;
-    transition: background 0.2s, transform 0.1s;
-    cursor: pointer;
-}
-
-.heart-spam-container:hover {
-    background: #333;
-}
-.heart-spam-container:active {
-    transform: scale(0.95); /* Whole container pulses */
-}
-
-.heart-spam-btn {
-    background: transparent;
+    justify-content: center;
+    padding: 20px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+  }
+  .modal-box {
+    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border: 1px solid rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    text-align: center;
+  }
+  .modal-box h3 {
+    color: white; margin-top: 0; font-size: 22px; margin-bottom: 5px;
+  }
+  .modal-box p {
+    color: #aaa; font-size: 14px; margin-bottom: 20px;
+  }
+  .submit-btn {
+    width: 100%;
+    background: var(--plyr-color-main);
+    color: white;
     border: none;
-    color: var(--heart-color);
-    padding: 5px;
+    padding: 14px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: transform 0.2s, background 0.2s;
+  }
+  .submit-btn:hover { background: #d9002b; transform: scale(1.02); }
+
+  .main-layout {
+    max-width: 100%;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 20px; 
+  }
+
+  .video-wrapper-left {
+    width: 100%;
+    position: relative; 
+  }
+
+  #poster-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background-size: cover;
+    background-position: center;
+    background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png'); 
+    border-radius: 0px;
     display: flex;
     align-items: center;
     justify-content: center;
-    outline: none;
-    pointer-events: none; /* Let container handle click */
+    cursor: pointer;
+    position: relative;
+    box-shadow: var(--glass-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  #poster-overlay {
+    background: rgba(0, 0, 0, 0.5); 
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    padding: 15px 25px;
+    border-radius: 50px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    pointer-events: none; 
+    max-width: 90%;
+    text-align: center;
+    margin: 0 auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    text-shadow: var(--text-shadow);
+    transform: translateZ(0);
+    will-change: transform, backdrop-filter;
+  }
+
+  #player-container {
+    display: none; 
+    width: 100%;
+    box-shadow: var(--glass-shadow);
+    position: relative; 
+  }
+
+  h2 {
+    font-size: 24px;
+    color: white;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: left; 
+    text-shadow: var(--text-shadow);
+  }
+
+  /* --- LINEUP BOX STYLES --- */
+  .lineup-box {
+    margin-top: 20px;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  .lineup-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--plyr-color-main);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .lineup-schedule {
+    font-size: 14px;
+    color: #ccc;
+    margin-bottom: 15px;
+    font-weight: 500;
+  }
+
+  /* COUNTDOWN TIMER STYLES */
+  .countdown-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .timer-block {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px;
+  }
+  .timer-number {
+    font-size: 20px;
+    font-weight: 800;
+    color: white;
+    font-family: 'Segoe UI', sans-serif;
+  }
+  .timer-label {
+    font-size: 10px;
+    color: #aaa;
+    text-transform: uppercase;
+  }
+
+  .lineup-content {
+    font-size: 14px;
+    line-height: 1.8;
+    color: #e0e0e0;
+    font-weight: 400;
+  }
+  .lineup-content span {
+    color: var(--plyr-color-main);
+    font-weight: bold;
+    margin: 0 4px;
+  }
+
+  /* --- MOBILE PORTRAIT (Standard View) --- */
+  @media (max-width: 768px) {
+    body { padding: 10px 0 !important; }
+    .main-layout { padding: 0 15px !important; }
+    h2 { font-size: 18px; }
+    #poster-overlay { font-size: 14px; padding: 10px 15px; border-radius: 35px; border-width: 1px; }
+    .center-logo { margin-top: 15px; }
+    .center-logo img { width: 40px; }
+    .lineup-content { font-size: 13px; }
+  }
+
+  /* --- 🚀 MOBILE LANDSCAPE ONLY --- */
+  @media screen and (max-width: 915px) and (orientation: landscape) {
+    #player-container, #poster-container {
+        position: fixed !important; top: 0 !important; left: 0 !important;
+        width: 100vw !important; height: 100vh !important;
+        z-index: 9999 !important; background: black !important;
+        margin: 0 !important; border-radius: 0 !important; border: none !important;
+    }
+    .plyr { width: 100% !important; height: 100% !important; }
+    video { width: 100% !important; height: 100% !important; object-fit: contain !important; }
+    .mobile-header, .center-logo, .lineup-box { display: none !important; }
+    .video-wrapper-left { height: 100vh; }
+    #views-display, #main-title { display: none !important; }
+  }
+
+  .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
+  .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+
+  .plyr {
+    width: 100%;
+    aspect-ratio: 16/9;
+    background: #000;
+    border-radius: 0px;
+    overflow: hidden;
+  }
+      
+  video { width: 100%; }
+
+/* --- REALISTIC STREAMING CONTROLS --- */
+.plyr__controls {
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%) !important;
+  padding: 20px 15px !important;
+  display: flex !important;
+  align-items: center;
+  position: relative; 
+  z-index: 50 !important;
 }
-
-
-.heart-spam-btn svg {
-    width: 28px;
-    height: 28px;
-    fill: currentColor;
-    filter: drop-shadow(0 0 5px rgba(255, 64, 129, 0.4));
-}
-
-
-/* Lineup Box Styles */
-.lineup-box {
-  width: 95%;
-  max-width: 900px;
-  background: #181818;
-  padding: 25px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  text-align: center;
-  margin-top: 20px; 
-}
-.schedule-section { border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 20px; }
-.schedule-date { font-size: 1.4rem; font-weight: 800; color: #fff; letter-spacing: 1px; margin-bottom: 5px; }
-.schedule-time { font-size: 1.2rem; font-weight: 600; color: var(--accent); margin-bottom: 5px; }
-.timer-note { font-size: 0.9rem; color: #888; margin-bottom: 20px; font-style: italic; }
-.schedule-timer-container { display: flex; justify-content: center; gap: 20px; margin-top: 10px; }
-.timer-block { display: flex; flex-direction: column; align-items: center; }
-.timer-number { font-size: 2.5rem; font-weight: 900; color: #fff; line-height: 1; }
-.timer-label { font-size: 0.8rem; color: #aaa; text-transform: uppercase; margin-top: 5px; font-weight: 500; }
-.timer-separator { font-size: 2rem; font-weight: 900; color: #fff; margin-top: -5px; }
-@media screen and (max-width: 480px) {
-  .timer-number { font-size: 1.8rem; }
-  .timer-label { font-size: 0.7rem; }
-  .schedule-timer-container { gap: 10px; }
-  .text-stat { font-size: 0.9rem; }
-}
-.lineup-title { color: #ddd; font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
-.lineup-list { color: #ccc; font-size: 1rem; line-height: 1.8; font-weight: 500; }
-.dot-separator { color: #555; margin: 0 8px; font-size: 0.8rem; vertical-align: middle; }
-
-/* Watermark */
-.video-box .watermark {
+.plyr__volume { margin-left: auto !important; }
+.plyr__time {
   position: absolute;
-  bottom: 20px; right: 40px; width: 80px; opacity: 0.8;
-  pointer-events: none; user-select: none; z-index: 9999;
-  transition: all 0.3s ease;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255,255,255,0.95);
+  text-shadow: 0 2px 2px rgba(0,0,0,0.8);
+  pointer-events: none; 
+  margin: 0 !important;
 }
-
-/* LANDSCAPE / FULLSCREEN MODE STYLES */
-.plyr--fullscreen {
-  border-radius: 0 !important; margin: 0 !important; width: 100vw !important; height: 100vh !important;
-  max-width: none !important; max-height: none !important; top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
-  background: #000 !important; position: fixed !important; z-index: 100000 !important;
-  display: flex !important; justify-content: center !important; align-items: center !important;
-  padding-left: env(safe-area-inset-left) !important; padding-right: env(safe-area-inset-right) !important;
+.plyr__time--current { left: 50%; transform: translate(-100%, -50%); padding-right: 5px; }
+.plyr__time--duration { left: 50%; transform: translate(0, -50%); padding-left: 5px; }
+.plyr__time--duration::before { content: "/"; position: absolute; left: -4px; color: rgba(255,255,255,0.5); }
+.plyr__control {
+  background: transparent;
+  border-radius: 8px !important;
+  transition: transform 0.2s ease, background 0.2s ease;
+  padding: 7px !important;
 }
-.plyr--fullscreen video { width: 100% !important; height: 100% !important; object-fit: contain !important; }
-
-/* Footer */
-footer { background: #181818; color: #aaa; padding: 30px 20px; text-align: center; font-size: 14px; border-top: 1px solid #333; margin-top: auto; }
-.social-handles { margin-top: 10px; display: flex; justify-content: center; gap: 15px; }
-.social-handles a { color: var(--accent); text-decoration: none; }
-
-/* Plyr controls overrides */
-:root { --plyr-color-main: var(--accent); }
-.plyr__control:hover, .plyr__control--pressed { color: #fff !important; }
-.plyr__progress--played { background: var(--accent) !important; }
-
-/* Fixed About Button & Modal */
-#aboutBtn { position: fixed; bottom: 20px; right: 20px; z-index: 9999; background:linear-gradient(to bottom, #000000, #1a1a1a); color: #fff; border: none; padding: 12px 18px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: transform 0.2s; font-size: 16px; }
-#aboutBtn:hover { transform: scale(1.05); }
-.modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); }
-.modal-content { background-color: #181818; margin: 10% auto; padding: 20px 30px; border-radius: 12px; max-width: 500px; color: #fff; position: relative; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-.modal-content h2 { margin-top: 0; color: var(--accent); }
-.modal-content p { line-height: 1.6; color: #ccc; }
-.modal-content .close { position: absolute; top: 10px; right: 15px; color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
-.modal-content .close:hover { color: #fff; }
-@media screen and (max-width: 480px) {
-  #aboutBtn { padding: 10px 14px; font-size: 14px; bottom: 15px; right: 15px; }
-  .modal-content { margin: 20% auto; padding: 15px 20px; }
-  .modal-content h2 { font-size: 1.3rem; }
-  .modal-content p { font-size: 0.9rem; }
+.plyr__control:hover { background: rgba(255, 255, 255, 0.2) !important; transform: scale(1.15); }
+.plyr__control svg { filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+.plyr__control--overlaid {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
+  width: 70px; height: 70px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
 }
+.plyr__control--overlaid:hover {
+  background: var(--plyr-color-main) !important;
+  border-color: var(--plyr-color-main);
+  transform: scale(1.1);
+}
+.plyr__captions {
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  text-shadow: 0 0 4px black, 0 0 8px black;
+  padding-bottom: 60px !important; 
+}
+.plyr__caption { background: transparent !important; }
+
+  /* --- GLASSMORPHISM SEEK OVERLAY --- */
+  .seek-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    z-index: 20; 
+    will-change: transform, opacity;
+  }
+  .seek-overlay.visible { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  .seek-overlay svg { width: 40px; height: 40px; fill: white; display: block; }
+      
+  .live-control-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 0, 0, 0.15);
+    border: 1px solid rgba(255, 0, 0, 0.4);
+    color: #ff4444;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-left: 10px;
+    pointer-events: none;
+    height: 24px;
+    user-select: none;
+  }
+  .live-dot {
+    width: 6px;
+    height: 6px;
+    background: #ff4444;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #ff4444;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(0.95); opacity: 0.7; }
+  }
+
+  .player-overlay-title {
+    position: absolute;
+    top: 20px; 
+    left: 0; 
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    padding: 0 60px;
+  }
+  .player-overlay-title.visible { opacity: 1; transform: translateY(0); }
+  .buffering-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 50;
+    pointer-events: none;
+    display: none;
+  }
+  .buffering-overlay.visible { display: block; }
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: var(--plyr-color-main);
+    animation: spin 1s ease-in-out infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* --- UPDATED VIEWS & DATE CONTAINER --- */
+  .views-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    margin-top: 15px; 
+    margin-bottom: 5px;
+    color: #a1a1a1;
+    font-family: 'Segoe UI', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    opacity: 0; 
+    transition: opacity 0.5s ease;
+  }
+  .views-container.visible { opacity: 1; }
+  .views-icon { width: 18px; height: 18px; fill: #a1a1a1; }
+  #current-date-display { margin-left: 5px; font-size: 14px; color: #666; font-weight: 400; }
+
+  @media (max-width: 600px) {
+    .player-overlay-title { font-size: 10px; top: 15px; padding: 0 40px; }
+    .live-control-badge { font-size: 9px; padding: 1px 6px; height: 20px; margin-left: 6px; }
+  }
+
+  @media (min-width: 900px) {
+    .main-layout {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px; padding: 0 20px; text-align: left;
+    }
+    .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
+  }
 </style>
 </head>
+
 <body>
 
-<header>
-  <div class="logo">LIVESTREAM101</div>
-  <div class="search-bar">
-    <input type="text" id="searchInput" placeholder="Search videos...">
-  </div>
-</header>
-
-<button id="aboutBtn">About</button>
-
-<div id="aboutModal" class="modal">
-  <div class="modal-content">
-    <span class="close">&times;</span>
-    <h2>About LIVESTREAM101</h2>
-    <p>Welcome to <strong>LIVESTREAM101</strong> (formerly Enhypen Stream)!<br><br>Your platform for high-quality live streaming of K-Contents.<br><br>We provide free streaming with no payments and no ads.<br>We also provide <strong>VODs of other K-Contents</strong> that we stream.<br><br>If you have a request, just send us a message on our <a href="https://x.com/101_livestream" target="_blank"><strong>X account</strong></a>.<br><br>Enjoy your favorite shows anytime, anywhere, for free!</p>
+<div id="login-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="margin-bottom: 20px;">
+        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" width="60" style="border-radius: 10px;">
+    </div>
+    <h3>Welcome to Zone Vault</h3>
+    <p>Click below to enter the live stream.</p>
+    
+    <button id="modal-submit-btn" class="submit-btn">ENTER ZONE VAULT</button>
   </div>
 </div>
 
-<div class="video-container" id="videoPage">
-
-  <div class="videos">
-    <div class="video-box">
-       
-      <div class="video-overlay-container" id="videoOverlay">
-          <div class="stat-item">
-              <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              <span id="overlayViewerCount">0</span>
-          </div>
-          <div class="stat-item">
-              <svg viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>
-              <span id="overlayHeartCount">0</span>
-          </div>
-      </div>
-
-      <div id="floatingHeartsContainer"></div>
-
-      <video id="player1" class="player" playsinline controls crossorigin
-        poster="https://uploads.onecompiler.io/43ddry4jt/447whtmmg/This%20live%20event%20has%20ended..png">
-      </video>
-      <h4 class="video-label">2025 KBS Gayo Daechukje</h4>
-    </div>
-  </div>
-
-
-  <div class="below-video-actions">
-      <div class="left-stats-display">
-        <div class="text-stat">
-            <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:#ccc"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
-            <strong id="textViewerCount">0</strong>
-        </div>
-        <div class="text-stat">
-             <svg viewBox="0 0 24 24" style="width:20px;height:20px;fill:var(--heart-color)"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-             <strong id="textHeartCount">0</strong>
-        </div>
-      </div>
-
-      <div class="heart-spam-container" id="heartSpamContainer">
-          <button class="heart-spam-btn">
-              <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-          </button>
-      </div>
-  </div>
-
-
-  <div class="lineup-box">
-    <div class="schedule-section">
-      <div class="schedule-date">DECEMBER 19, 2025</div>
-      <div class="schedule-time">7:15PM KST | 6:15 PM PHT</div>
-      <div class="timer-note">Note: The timer below is based on PHT time.</div>
-      <div class="schedule-timer-container" id="scheduleTimer">
-        <div class="timer-block"><span class="timer-number" id="t-days">00</span><span class="timer-label">Days</span></div><div class="timer-separator">:</div>
-        <div class="timer-block"><span class="timer-number" id="t-hours">00</span><span class="timer-label">Hours</span></div><div class="timer-separator">:</div>
-        <div class="timer-block"><span class="timer-number" id="t-minutes">00</span><span class="timer-label">Minutes</span></div><div class="timer-separator">:</div>
-        <div class="timer-block"><span class="timer-number" id="t-seconds">00</span><span class="timer-label">Seconds</span></div>
-      </div>
-    </div>
-    <div class="lineup-title">2025 KBS Gayo Daechukje Line Up</div>
-    <div class="lineup-list">
-      NCT DREAM <span class="dot-separator">•</span> MARK <span class="dot-separator">•</span> HAECHAN <span class="dot-separator">•</span> AHOF <span class="dot-separator">•</span> P1HARMONY <span class="dot-separator">•</span> THE BOYZ <span class="dot-separator">•</span> tripleS <span class="dot-separator">•</span> aespa <span class="dot-separator">•</span> LE SSERAFIM <span class="dot-separator">•</span> KISS OF LIFE <span class="dot-separator">•</span> n.SSign <span class="dot-separator">•</span> EVNNE <span class="dot-separator">•</span> CLOSE YOUR EYES <span class="dot-separator">•</span> HITGS <span class="dot-separator">•</span> Baby DONT Cry <span class="dot-separator">•</span> fromis_9 <span class="dot-separator">•</span> STAYC <span class="dot-separator">•</span> LOVELYZ <span class="dot-separator">•</span> DAYOUNG <span class="dot-separator">•</span> CNBLUE <span class="dot-separator">•</span> LEE CHANWON <span class="dot-separator">•</span> PARK SEOJIN <span class="dot-separator">•</span> 10CM <span class="dot-separator">•</span> ROY KIM <span class="dot-separator">•</span> JANNABI
-    </div>
-  </div>
+<div class="center-logo">
+  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
 </div>
 
-<script>
-(function() {
-  const d=document.getElementById('t-days'),h=document.getElementById('t-hours'),m=document.getElementById('t-minutes'),s=document.getElementById('t-seconds');
-  const countDownDate = new Date("2025-12-19T18:15:00+08:00").getTime();
-  const updateTimer = setInterval(function() {
-    const now = new Date().getTime(), distance = countDownDate - now;
-    if (distance < 0) { clearInterval(updateTimer); return; }
-    d.innerHTML = Math.floor(distance / (1000 * 60 * 60 * 24));
-    h.innerHTML = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-    m.innerHTML = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-    s.innerHTML = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
-  }, 1000);
-})();
-</script>
+<div class="main-layout">
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, onValue, set, onDisconnect, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyAJ14uN4-dajZiNMwYMiYcLCRu0KZ2GNbg",
-    authDomain: "svtonair.firebaseapp.com",
-    databaseURL: "https://svtonair-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "svtonair",
-    storageBucket: "svtonair.firebasestorage.app",
-    messagingSenderId: "1407706609",
-    appId: "1:1407706609:web:b4e2c33bdb4b0da334d050"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const streamId = "stream_kbs_2025";
-
-  // --- 1. REALTIME VIEWERS ---
-  let userId = localStorage.getItem("ls101_anon_id");
-  if (!userId) { userId = 'anon_' + Math.random().toString(36).substr(2, 9); localStorage.setItem("ls101_anon_id", userId); }
-
-  const connectedRef = ref(db, ".info/connected");
-  const viewersRef = ref(db, `livestream/${streamId}/viewers`);
-  const myViewerRef = push(viewersRef);
-
-  // This handles the +1 (join) and -1 (leave) logic
-  onValue(connectedRef, (snap) => {
-    if (snap.val() === true) {
-      // User connected: Add to DB (+1)
-      set(myViewerRef, { joined: Date.now() });
+  <div class="video-wrapper-left">
       
-      // User disconnected/closed tab: Remove from DB (-1)
-      onDisconnect(myViewerRef).remove();
-    }
-  });
+    <div id="poster-container">
+      <div id="poster-overlay">Loading Live...</div>
+    </div>
 
-  const overlayViewerCountElem = document.getElementById("overlayViewerCount");
-  const textViewerCountElem = document.getElementById("textViewerCount");
-
-  onValue(viewersRef, (snap) => {
-    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
-    // Uses the new full number format
-    const formatted = formatCount(count);
-    overlayViewerCountElem.innerText = formatted;
-    textViewerCountElem.innerText = formatted;
-  });
-
-
-  // --- 2. UNLIMITED HEART SPAM SYSTEM ---
-  const heartSpamContainer = document.getElementById("heartSpamContainer");
-  const textHeartCountElem = document.getElementById("textHeartCount");
-  const overlayHeartCountElem = document.getElementById("overlayHeartCount");
-  const floatingHeartsContainer = document.getElementById("floatingHeartsContainer");
-  const totalHeartsRef = ref(db, `livestream/${streamId}/stats/totalHearts`);
-
-  onValue(totalHeartsRef, (snap) => {
-    const count = snap.val() || 0;
-    // Uses the new full number format
-    const formatted = formatCount(count);
-    textHeartCountElem.innerText = formatted;
-    overlayHeartCountElem.innerText = formatted;
-  });
-
-  heartSpamContainer.addEventListener("click", () => {
-    createFloatingHeart();
-    // Adds +1 to heart count in database
-    runTransaction(totalHeartsRef, (currentHearts) => {
-      return (currentHearts || 0) + 1;
-    });
-  });
-
-  // --- UPDATED REALISTIC HEART CREATION ---
-  function createFloatingHeart() {
-      const heart = document.createElement("div");
-      heart.classList.add("floating-heart");
-      // Use a variety of heart emojis/colors if desired, stick to red for now
-      heart.innerHTML = "❤️"; 
+    <div id="player-container">
+      <div id="player-overlay-title" class="player-overlay-title"></div>
       
-      // 1. Randomize Starting Position (Horizontal)
-      const randomLeft = Math.random() * 90 + 5; // 5% to 95% across
-      heart.style.left = `${randomLeft}%`;
+      <div id="buffering-overlay" class="buffering-overlay">
+        <div class="spinner"></div>
+      </div>
+      
+      <div class="plyr__video-wrapper">
+        <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
+      </div>
+    </div>
 
-      // 2. Randomize Size
-      const randomSize = Math.random() * 15 + 18; // 18px to 33px
-      heart.style.fontSize = `${randomSize}px`;
+    <div id="views-display" class="views-container">
+      <svg class="views-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      <span id="view-count-text">0</span>
+      <span id="current-date-display"></span>
+    </div>
 
-      // 3. Randomize Physics Variables for CSS
-      const duration = Math.random() * 2.5 + 2.5; // 2.5s to 5s duration
-      const distance = -(Math.random() * 250 + 350); // -350px to -600px up
-      const rotation = Math.random() * 720 - 360; // -360deg to +360deg spin
-      const wobble = Math.random() * 50 - 25; // -25px to +25px sideways drift
-      const scaleStart = Math.random() * 0.3 + 0.4; // Start small (0.4-0.7)
-      const scaleEnd = Math.random() * 0.8 + 1.2; // End large (1.2-2.0)
+    <h2 id="main-title"></h2>
 
-      // Set custom properties
-      heart.style.setProperty('--fly-duration', `${duration}s`);
-      heart.style.setProperty('--fly-distance', `${distance}px`);
-      heart.style.setProperty('--rotation-end', `${rotation}deg`);
-      heart.style.setProperty('--wobble-dir', `${wobble}px`);
-      heart.style.setProperty('--scale-start', `${scaleStart}`);
-      heart.style.setProperty('--scale-end', `${scaleEnd}`);
-
-      floatingHeartsContainer.appendChild(heart);
-
-      // Cleanup matches max duration
-      setTimeout(() => { heart.remove(); }, (duration * 1000) + 200);
-  }
-
-  // --- CHANGED: Now shows full number with commas (e.g. 1,533) instead of 1.5K
-  function formatCount(num) {
-    if (!num) return "0";
-    return num.toLocaleString(); 
-  }
-</script>
-
-<script>
-window.onload = function () {
-  const sources = [{ id: "player1", qualities: { 1080: "https://hnd-prod-catalyst-0.lp-playback.studio/hls/video+42celkrsxnhb4umi/1_0/index.m3u8?tkn=7b29bc0509b1a"}, defaultQuality: 1080 }];
-  sources.forEach(src => {
-    const video = document.getElementById(src.id);
-    if (!video) return;
-    let hls; let currentQuality = src.defaultQuality;
-    function loadStream(quality) {
-      const streamUrl = src.qualities[quality]; if (!streamUrl) return;
-      if (hls) hls.destroy(); hls = new Hls({ capLevelToPlayerSize: true });
-      hls.loadSource(streamUrl); hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function () { video.play().catch(() => { video.muted = true; video.play(); }); });
-    }
-    
-    // Plyr Config
-    const player = new Plyr(video, { 
-      autoplay: true, 
-      muted: false, 
-      seekTime: 10, 
-      controls: ["play-large", "play", "mute", "airplay", "fullscreen"], 
-      settings: ["quality", "speed", "captions"],
-      hideControls: true, // Ensure this is on
-      quality: { default: src.defaultQuality, options: Object.keys(src.qualities).map(Number), forced: true, onChange: (newQuality) => { currentQuality = newQuality; loadStream(newQuality); } } 
-    });
-    
-    if (Hls.isSupported()) { loadStream(currentQuality); } else if (video.canPlayType("application/vnd.apple.mpegurl")) { video.src = src.qualities[currentQuality]; video.play(); }
-
-    /* --- MOVE OVERLAY & SETUP EVENTS --- */
-    const overlay = document.getElementById('videoOverlay');
-    const floatContainer = document.getElementById('floatingHeartsContainer');
-    
-    if (player.elements.container && overlay) {
-        player.elements.container.appendChild(overlay);
-        player.elements.container.appendChild(floatContainer);
+    <div class="lineup-box">
+        <div class="lineup-header">2025 KBS Gayo Daechukje</div>
+        <div class="lineup-schedule">December 19, 2025 | Friday <br> 7:15PM KST / 6:15PM PHT</div>
         
-        // --- JS EVENTS TO SYNC OVERLAY HIDING ---
-        player.on('controlshidden', () => {
-             overlay.style.opacity = '0';
-        });
-        player.on('controlsshown', () => {
-             overlay.style.opacity = '1';
-        });
-    }
+        <div class="countdown-container">
+            <div class="timer-block">
+                <div class="timer-number" id="t-days">00</div>
+                <div class="timer-label">Days</div>
+            </div>
+            <div class="timer-block">
+                <div class="timer-number" id="t-hours">00</div>
+                <div class="timer-label">Hours</div>
+            </div>
+            <div class="timer-block">
+                <div class="timer-number" id="t-mins">00</div>
+                <div class="timer-label">Mins</div>
+            </div>
+            <div class="timer-block">
+                <div class="timer-number" id="t-secs">00</div>
+                <div class="timer-label">Secs</div>
+            </div>
+        </div>
 
-    /* WATERMARK SETUP */
-    const watermark = document.createElement('img');
-    watermark.className = 'watermark';
-    player.elements.container.appendChild(watermark);
+        <div class="lineup-content">
+            NCT DREAM • MARK • HAECHAN • AHOF • P1HARMONY • THE BOYZ • tripleS • aespa • LE SSERAFIM • KISS OF LIFE • n.SSign • EVNNE • CLOSE YOUR EYES • HITGS • Baby DONT Cry • fromis_9 • STAYC • LOVELYZ • DAYOUNG • CNBLUE • LEE CHANWON • PARK SEOJIN • 10CM • ROY KIM • JANNABI
+        </div>
+    </div>
+    
+  </div>
+  
+  </div> 
 
-    // --- LANDSCAPE / FULLSCREEN AUTOMATION ---
-    player.on('enterfullscreen', async () => {
-      try { if (screen.orientation && screen.orientation.lock) { await screen.orientation.lock('landscape'); } } catch (err) { console.warn('Auto-rotation not supported', err); }
-    });
-    player.on('exitfullscreen', async () => {
-      try { if (screen.orientation && screen.orientation.unlock) { await screen.orientation.unlock(); } } catch (err) { console.warn('Orientation unlock not supported', err); }
-    });
-      if (window.screen && window.screen.orientation) {
-       window.screen.orientation.addEventListener('change', () => {
-          const type = window.screen.orientation.type;
-          if (type.includes('landscape')) { if (!player.fullscreen.active) player.fullscreen.enter().catch(() => {}); } 
-          else if (type.includes('portrait')) { if (player.fullscreen.active) player.fullscreen.exit(); }
-       });
-    }
-  });
+<script>
+// --- 1. CONFIGURATION & DATA ---
+const playlistData = [
+  { 
+    id: "1", 
+    title: "2025 KBS Gayo Daechukje", 
+    status: "Live", // THIS ONE WILL AUTOPLAY
+    date: "December 19, 2025 6:15 PM",
+    image: "",
+  }
+];
+
+const posterContainer = document.getElementById('poster-container');
+const playerContainer = document.getElementById('player-container');
+const mainTitle = document.getElementById('main-title');
+const overlayTitle = document.getElementById('player-overlay-title'); 
+const currentDateDisplay = document.getElementById('current-date-display');
+const bufferingOverlay = document.getElementById('buffering-overlay');
+const viewsDisplay = document.getElementById('views-display');
+const viewCountText = document.getElementById('view-count-text');
+
+let currentViewListenerRef = null;
+let currentPresenceRef = null; 
+window.currentEpData = null;
+window.currentUserXID = null; 
+</script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
+  authDomain: "tvnstream-b4497.firebaseapp.com",
+  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
+  projectId: "tvnstream-b4497",
+  storageBucket: "tvnstream-b4497.appspot.com",
+  messagingSenderId: "308384754214",
+  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
 };
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(); 
+const db = firebase.database();
+
+// --- MODAL & LOGIN LOGIC ---
+document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('login-modal');
+    const submitBtn = document.getElementById('modal-submit-btn');
+
+    // COUNTDOWN TIMER LOGIC
+    const targetDate = new Date("2025-12-19T18:15:00+08:00").getTime(); // PHT Timezone (UTC+8)
+
+    function updateTimer() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance < 0) {
+            document.getElementById("t-days").innerText = "00";
+            document.getElementById("t-hours").innerText = "00";
+            document.getElementById("t-mins").innerText = "00";
+            document.getElementById("t-secs").innerText = "00";
+            return;
+        }
+
+        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("t-days").innerText = days < 10 ? "0" + days : days;
+        document.getElementById("t-hours").innerText = hours < 10 ? "0" + hours : hours;
+        document.getElementById("t-mins").innerText = minutes < 10 ? "0" + minutes : minutes;
+        document.getElementById("t-secs").innerText = seconds < 10 ? "0" + seconds : seconds;
+    }
+    
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+
+    // --- 💾 CHECK SAVED DATA FIRST ---
+    const savedX = localStorage.getItem('zv_x_username');
+    
+    if (savedX) {
+        modal.style.display = 'none';
+        window.currentUserXID = savedX;
+        startApp(); 
+    } else {
+        modal.style.display = 'flex';
+    }
+
+    // MODIFIED SUBMIT LISTENER - NO VALIDATION
+    submitBtn.addEventListener('click', () => {
+        const xVal = "Guest_" + Math.floor(Math.random() * 10000);
+
+        localStorage.setItem('zv_x_username', xVal);
+
+        window.currentUserXID = xVal;
+        
+        const safeId = xVal.replace(/[.#$[\]]/g, "_");
+        db.ref('users/' + safeId).set({
+            x_username: xVal,
+            tg_username: "Not Provided",
+            last_login: Date.now()
+        });
+
+        modal.style.opacity = '0';
+        setTimeout(() => { modal.style.display = 'none'; }, 500);
+        startApp();
+    });
+});
+
+function startApp() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const videoId = urlParams.get('v');
+    
+    if (videoId) {
+        setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
+    } else {
+        const liveEp = playlistData.find(ep => ep.status && ep.status.toLowerCase() === 'live');
+        if (liveEp) {
+             console.log("Autoplaying LIVE episode:", liveEp.title);
+             setTimeout(() => { loadAndPlayEpisode(liveEp.id, false); }, 800);
+        }
+    }
+    
+    if(currentDateDisplay) {
+        const now = new Date();
+        currentDateDisplay.textContent = " • " + now.toLocaleTimeString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+    }
+}
+
+function smartGoBack() {
+    if (document.referrer && window.history.length > 1) window.history.back();
+    else window.location.href = 'videos.html';
+}
+
+const video = document.getElementById("videoPlayer");
+let hls;
+let player = null;
+
+const defaultPlyrOptions = {
+  captions: { active: true, update: true, language: "en" },
+  controls: ['play-large', 'play', 'mute', 'settings', 'fullscreen'],
+  settings: ["captions","speed","quality"],
+  clickToPlay: false, 
+  dblclickFullscreen: false,
+  i18n: { quality: 'Quality', qualityBadge: { 2160: '4K', 1440: 'HD', 1080: 'HD', 720: 'HD', 576: 'SD', 480: 'SD' } }
+};
+
+function loadAndPlayEpisode(epId, updateUrl = true) {
+    const ep = playlistData.find(item => item.id === epId);
+    if (!ep) return;
+
+    if (updateUrl) {
+        const titleSlug = ep.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        let newUrl = window.location.pathname + `?v=${ep.id}&session=${Date.now()}&title=${titleSlug}`;
+        history.pushState({id: ep.id}, '', newUrl);
+    }
+
+    window.currentEpData = ep;
+    if(overlayTitle) overlayTitle.textContent = ep.title;
+    if(mainTitle) mainTitle.textContent = ep.title;
+
+    posterContainer.style.display = "none";
+    playerContainer.style.display = "block";
+
+    if (currentPresenceRef) { currentPresenceRef.remove(); currentPresenceRef.onDisconnect().cancel(); currentPresenceRef = null; }
+    if (currentViewListenerRef) { currentViewListenerRef.off(); }
+
+    const rawId = window.currentUserXID || "Anonymous";
+    const viewerId = rawId.replace(/[.#$[\]]/g, "_"); 
+
+    // WATERMARK LOGIC REMOVED HERE
+
+    currentPresenceRef = db.ref(`active_viewers/${epId}/${viewerId}`);
+    currentPresenceRef.onDisconnect().remove();
+    currentPresenceRef.set({ 
+        timestamp: firebase.database.ServerValue.TIMESTAMP, 
+        device: navigator.userAgent,
+        x_handle: rawId
+    });
+
+    currentViewListenerRef = db.ref(`active_viewers/${epId}`);
+    currentViewListenerRef.on('value', (snapshot) => {
+        const viewersData = snapshot.val();
+        const count = viewersData ? Object.keys(viewersData).length : 0;
+        viewCountText.textContent = new Intl.NumberFormat().format(count);
+        viewsDisplay.classList.add('visible');
+    });
+
+    const directStreamUrl = "https://hnd-prod-catalyst-0.lp-playback.studio/hls/video+42celkrsxnhb4umi/1_0/index.m3u8?tkn=7b29bc0509b1a";
+    setupStream(directStreamUrl, ep.status);
+}
+
+function setupStream(streamUrl, status) {
+    const resumePlayback = () => {
+        updatePlayerLiveBadge(status);
+        var playPromise = player.play();
+        if (playPromise !== undefined) {
+            playPromise.then(_ => {
+                player.muted = false; 
+            }).catch(error => {
+                player.muted = true;
+                player.play();
+            });
+        }
+    };
+
+    if(typeof Hls !== 'undefined' && Hls.isSupported()){
+        if(hls) hls.destroy();
+        hls = new Hls();
+        hls.loadSource(streamUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
+            const availableQualities = hls.levels.map((l) => l.height);
+            availableQualities.unshift(0);
+            const newOptions = Object.assign({}, defaultPlyrOptions);
+            newOptions.quality = {
+                default: 0, 
+                options: availableQualities,
+                forced: true,
+                onChange: (newQuality) => {
+                    if (newQuality === 0) hls.currentLevel = -1; 
+                    else hls.levels.forEach((level, idx) => { if (level.height === newQuality) hls.currentLevel = idx; });
+                }
+            };
+            if(player) player.destroy();
+            player = new Plyr(video, newOptions);
+            attachPlayerEvents();
+            setTimeout(resumePlayback, 100);
+        });
+    } else {
+        video.src = streamUrl;
+        if(player) player.destroy();
+        player = new Plyr(video, defaultPlyrOptions);
+        attachPlayerEvents();
+        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
+    }
+}
+
+function updatePlayerLiveBadge(status) {
+    if (!player || !player.elements || !player.elements.controls) return;
+    const controls = player.elements.controls;
+    let badge = controls.querySelector('.live-control-badge');
+    if(status && status.toUpperCase() === 'LIVE') {
+        if(!badge) {
+            badge = document.createElement('div');
+            badge.className = 'live-control-badge';
+            badge.innerHTML = '<span class="live-dot"></span>LIVE';
+            const playBtn = controls.querySelector('[data-plyr="play"]');
+            if(playBtn) playBtn.after(badge); else controls.insertBefore(badge, controls.firstChild);
+        }
+        badge.style.display = 'flex';
+    } else { if(badge) badge.style.display = 'none'; }
+}
+
+window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.id) loadAndPlayEpisode(event.state.id, false);
+    else { posterContainer.style.display = "flex"; playerContainer.style.display = "none"; if(player) player.pause(); }
+});
+
+const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
+
+function attachPlayerEvents() {
+    if(!player) return;
+    player.on('enterfullscreen', () => { if (isMobileOrTablet && screen.orientation) screen.orientation.lock('landscape').catch(()=>{}); });
+    player.on('exitfullscreen', () => { if (isMobileOrTablet && screen.orientation) screen.orientation.unlock(); });
+    player.on('waiting', () => { if (bufferingOverlay) bufferingOverlay.classList.add('visible'); });
+    player.on('playing', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
+    player.on('pause', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
+    player.on('canplay', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
+
+    player.on('ready', () => {
+        const videoWrapper = player.elements.container.querySelector('.plyr__video-wrapper');
+        if (!videoWrapper) return;
+        
+        const overlayTitle = document.getElementById('player-overlay-title'); 
+        const buffer = document.getElementById('buffering-overlay');
+        
+        if(overlayTitle) videoWrapper.appendChild(overlayTitle); 
+        if(buffer) videoWrapper.appendChild(buffer);
+        
+        player.on('controlsshown', () => { if(overlayTitle) overlayTitle.classList.add('visible'); });
+        player.on('controlshidden', () => { if(overlayTitle && !player.paused) overlayTitle.classList.remove('visible'); });
+        if(overlayTitle) overlayTitle.classList.add('visible');
+
+        const rewindIcon = document.getElementById('rewind-icon-overlay'), forwardIcon = document.getElementById('forward-icon-overlay'), playPauseIcon = document.getElementById('play-pause-icon-overlay');
+        if (rewindIcon) videoWrapper.appendChild(rewindIcon); if (forwardIcon) videoWrapper.appendChild(forwardIcon); if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
+
+        let lastTapTime = 0, tapTimeout = null;
+        const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
+        const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
+        if(playSvg) playSvg.style.display = 'block'; if(pauseSvg) pauseSvg.style.display = 'block';
+
+        function showSeekIcon(type) {
+            if(rewindIcon) rewindIcon.classList.remove('visible'); if(forwardIcon) forwardIcon.classList.remove('visible'); if(playPauseIcon) playPauseIcon.classList.remove('visible');
+            let iconToShow = (type === 'rewind') ? rewindIcon : (type === 'forward') ? forwardIcon : playPauseIcon;
+            if (type === 'play-pause' && playPauseIcon) {
+                playPauseIcon.innerHTML = '';
+                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
+            }
+            if (iconToShow) { iconToShow.classList.add('visible'); setTimeout(() => iconToShow.classList.remove('visible'), 500); }
+        }
+
+        videoWrapper.addEventListener('click', (event) => {
+            if (event.target.closest('.plyr__controls')) return;
+            event.stopPropagation();
+            const currentTime = new Date().getTime();
+            if (currentTime - lastTapTime > 0 && currentTime - lastTapTime < 300) {
+                if (tapTimeout) clearTimeout(tapTimeout);
+                const tapX = event.clientX - videoWrapper.getBoundingClientRect().left;
+                if (tapX < videoWrapper.getBoundingClientRect().width * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
+                else if (tapX > videoWrapper.getBoundingClientRect().width * 0.65) { player.forward(10); showSeekIcon('forward'); }
+                else { showSeekIcon('play-pause'); player.togglePlay(); }
+                lastTapTime = 0;
+            } else {
+                event.preventDefault(); tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
+            }
+            lastTapTime = currentTime;
+        });
+        videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
+    });
+
+    let lastSaveTime = 0; 
+    player.on("timeupdate", () => {
+        const userX = window.currentUserXID;
+        if (userX && window.currentEpData && !player.paused && player.currentTime > 5 && Date.now() - lastSaveTime > 5000) { 
+            let pageName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1) || "videos.html"; 
+            const safeId = userX.replace(/[.#$[\]]/g, "_");
+            db.ref('watchHistory/' + safeId + '/' + window.currentEpData.id).update({ id: window.currentEpData.id, title: window.currentEpData.title, image: window.currentEpData.image, currentTime: player.currentTime, duration: player.duration || 0, timestamp: Date.now(), page: pageName });
+            lastSaveTime = Date.now();
+        }
+    });
+}
+window.addEventListener('beforeunload', () => { if (currentPresenceRef) currentPresenceRef.remove(); });
 </script>
 
 <script>
-// Security Scripts
-document.addEventListener('contextmenu', e => e.preventDefault());
-document.addEventListener('keydown', e => { if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key.toUpperCase() === 'I' || e.key.toUpperCase() === 'J' || e.key.toUpperCase() === 'C')) || (e.ctrlKey && e.key.toUpperCase() === 'U')) { e.preventDefault(); alert('⚠️ Developer tools are disabled for security reasons.'); } });
-window.addEventListener('keydown', e => { if (e.key === 'ContextMenu' || e.key === 'Apps') e.preventDefault(); });
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      reg.onupdatefound = () => {
+        const newSW = reg.installing;
+        newSW.onstatechange = () => { if (newSW.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
+      };
+    }).catch(err => {});
+  }
 </script>
 
-<script>
-// Modal script
-const aboutBtn = document.getElementById("aboutBtn"), modal = document.getElementById("aboutModal"), closeBtn = modal.querySelector(".close");
-aboutBtn.addEventListener("click", () => { modal.style.display = "block"; });
-closeBtn.addEventListener("click", () => { modal.style.display = "none"; });
-window.addEventListener("click", (e) => { if (e.target === modal) { modal.style.display = "none"; } });
-</script>
+<div id="rewind-icon-overlay" class="seek-overlay">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.9998 1.5V6.4428C5.5598 6.9048 2.4418 10.3368 2.4418 14.8828C2.4418 19.8288 6.4418 23.8288 11.3878 23.8288C15.8278 23.8288 19.4678 20.4968 20.0758 16.1988H17.5558C17.0098 18.9888 14.4838 21.3288 11.3878 21.3288C7.8118 21.3288 4.9418 18.4588 4.9418 14.8828C4.9418 11.6688 7.3738 9.0708 10.4998 8.6148V13.4998L17.4998 7.4998L9.9998 1.5Z"/></svg>
+</div>
+<div id="forward-icon-overlay" class="seek-overlay">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.0002 1.5L6.50016 7.49984L14.0002 13.4998V8.61484C17.1262 9.07084 19.5582 11.6688 19.5582 14.8828C19.5582 18.4588 16.6882 21.3288 13.1122 21.3288C10.0162 21.3288 7.49016 18.9888 6.94416 16.1988H4.42416C5.03216 20.4968 8.67216 23.8288 13.1122 23.8288C18.0582 23.8288 22.0582 19.8288 22.0582 14.8828C22.0582 10.3368 18.9402 6.90484 14.5002 6.44284V1.5Z"/></svg>
+</div>
+<div id="play-pause-icon-overlay" class="seek-overlay"></div>
 
-<footer>
-  &copy; 2025 <a href="https://x.com/101_livestream" target="_blank">LIVESTREAM 101</a> | All rights reserved.
-  <div class="social-handles"><a href="https://t.me/livestream101ontg" target="_blank">Livestream101ontg</a></div>
-</footer>
+<svg id="svg-play" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14V19.14L19 12.14L8 5.14Z"/></svg>
+<svg id="svg-pause" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z"/></svg>
 
 </body>
 </html>
