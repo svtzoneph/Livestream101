@@ -381,7 +381,7 @@ footer { background: #181818; color: #aaa; padding: 30px 20px; text-align: cente
 
   <div class="videos">
     <div class="video-box">
-      
+       
       <div class="video-overlay-container" id="videoOverlay">
           <div class="stat-item">
               <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -460,7 +460,6 @@ footer { background: #181818; color: #aaa; padding: 30px 20px; text-align: cente
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, onValue, set, onDisconnect, push, runTransaction } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyAJ14uN4-dajZiNMwYMiYcLCRu0KZ2GNbg",
@@ -474,86 +473,86 @@ footer { background: #181818; color: #aaa; padding: 30px 20px; text-align: cente
 
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
-  const auth = getAuth(app);
   const streamId = "stream_kbs_2025";
 
-  // Elements
+  // --- 1. REALTIME VIEWERS ---
+  let userId = localStorage.getItem("ls101_anon_id");
+  if (!userId) { userId = 'anon_' + Math.random().toString(36).substr(2, 9); localStorage.setItem("ls101_anon_id", userId); }
+
+  const connectedRef = ref(db, ".info/connected");
+  const viewersRef = ref(db, `livestream/${streamId}/viewers`);
+  const myViewerRef = push(viewersRef);
+
+  // This handles the +1 (join) and -1 (leave) logic
+  onValue(connectedRef, (snap) => {
+    if (snap.val() === true) {
+      // User connected: Add to DB (+1)
+      set(myViewerRef, { joined: Date.now() });
+      
+      // User disconnected/closed tab: Remove from DB (-1)
+      onDisconnect(myViewerRef).remove();
+    }
+  });
+
   const overlayViewerCountElem = document.getElementById("overlayViewerCount");
   const textViewerCountElem = document.getElementById("textViewerCount");
+
+  onValue(viewersRef, (snap) => {
+    const count = snap.exists() ? Object.keys(snap.val()).length : 0;
+    // Uses the new full number format
+    const formatted = formatCount(count);
+    overlayViewerCountElem.innerText = formatted;
+    textViewerCountElem.innerText = formatted;
+  });
+
+
+  // --- 2. UNLIMITED HEART SPAM SYSTEM ---
   const heartSpamContainer = document.getElementById("heartSpamContainer");
   const textHeartCountElem = document.getElementById("textHeartCount");
   const overlayHeartCountElem = document.getElementById("overlayHeartCount");
   const floatingHeartsContainer = document.getElementById("floatingHeartsContainer");
+  const totalHeartsRef = ref(db, `livestream/${streamId}/stats/totalHearts`);
 
-  // Sign in anonymously first to handle permission issues
-  signInAnonymously(auth).then(() => {
-      console.log("Connected to Firebase!");
-
-      // --- 1. REALTIME VIEWERS ---
-      const connectedRef = ref(db, ".info/connected");
-      const viewersRef = ref(db, `livestream/${streamId}/viewers`);
-      
-      // 'push' generates a unique ID, acting as the session ID
-      const myViewerRef = push(viewersRef);
-
-      onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-          // Add this user to viewers list
-          set(myViewerRef, { joined: Date.now() });
-          // Remove them when they disconnect (close tab)
-          onDisconnect(myViewerRef).remove();
-        }
-      });
-
-      onValue(viewersRef, (snap) => {
-        const count = snap.exists() ? Object.keys(snap.val()).length : 0;
-        const formatted = formatCount(count);
-        overlayViewerCountElem.innerText = formatted;
-        textViewerCountElem.innerText = formatted;
-      });
-
-      // --- 2. HEARTS SYSTEM ---
-      const totalHeartsRef = ref(db, `livestream/${streamId}/stats/totalHearts`);
-
-      onValue(totalHeartsRef, (snap) => {
-        const count = snap.val() || 0;
-        const formatted = formatCount(count);
-        textHeartCountElem.innerText = formatted;
-        overlayHeartCountElem.innerText = formatted;
-      });
-
-      heartSpamContainer.addEventListener("click", () => {
-        createFloatingHeart();
-        // Increment global counter safely
-        runTransaction(totalHeartsRef, (currentHearts) => {
-          return (currentHearts || 0) + 1;
-        });
-      });
-
-  }).catch((error) => {
-      console.error("Firebase Auth Error:", error);
-      console.log("Please enable Anonymous Auth in Firebase Console.");
+  onValue(totalHeartsRef, (snap) => {
+    const count = snap.val() || 0;
+    // Uses the new full number format
+    const formatted = formatCount(count);
+    textHeartCountElem.innerText = formatted;
+    overlayHeartCountElem.innerText = formatted;
   });
 
-  // --- HELPER FUNCTIONS ---
+  heartSpamContainer.addEventListener("click", () => {
+    createFloatingHeart();
+    // Adds +1 to heart count in database
+    runTransaction(totalHeartsRef, (currentHearts) => {
+      return (currentHearts || 0) + 1;
+    });
+  });
+
+  // --- UPDATED REALISTIC HEART CREATION ---
   function createFloatingHeart() {
       const heart = document.createElement("div");
       heart.classList.add("floating-heart");
+      // Use a variety of heart emojis/colors if desired, stick to red for now
       heart.innerHTML = "❤️"; 
       
-      const randomLeft = Math.random() * 90 + 5;
+      // 1. Randomize Starting Position (Horizontal)
+      const randomLeft = Math.random() * 90 + 5; // 5% to 95% across
       heart.style.left = `${randomLeft}%`;
 
-      const randomSize = Math.random() * 15 + 18;
+      // 2. Randomize Size
+      const randomSize = Math.random() * 15 + 18; // 18px to 33px
       heart.style.fontSize = `${randomSize}px`;
 
-      const duration = Math.random() * 2.5 + 2.5;
-      const distance = -(Math.random() * 250 + 350);
-      const rotation = Math.random() * 720 - 360;
-      const wobble = Math.random() * 50 - 25;
-      const scaleStart = Math.random() * 0.3 + 0.4;
-      const scaleEnd = Math.random() * 0.8 + 1.2;
+      // 3. Randomize Physics Variables for CSS
+      const duration = Math.random() * 2.5 + 2.5; // 2.5s to 5s duration
+      const distance = -(Math.random() * 250 + 350); // -350px to -600px up
+      const rotation = Math.random() * 720 - 360; // -360deg to +360deg spin
+      const wobble = Math.random() * 50 - 25; // -25px to +25px sideways drift
+      const scaleStart = Math.random() * 0.3 + 0.4; // Start small (0.4-0.7)
+      const scaleEnd = Math.random() * 0.8 + 1.2; // End large (1.2-2.0)
 
+      // Set custom properties
       heart.style.setProperty('--fly-duration', `${duration}s`);
       heart.style.setProperty('--fly-distance', `${distance}px`);
       heart.style.setProperty('--rotation-end', `${rotation}deg`);
@@ -562,14 +561,15 @@ footer { background: #181818; color: #aaa; padding: 30px 20px; text-align: cente
       heart.style.setProperty('--scale-end', `${scaleEnd}`);
 
       floatingHeartsContainer.appendChild(heart);
+
+      // Cleanup matches max duration
       setTimeout(() => { heart.remove(); }, (duration * 1000) + 200);
   }
 
+  // --- CHANGED: Now shows full number with commas (e.g. 1,533) instead of 1.5K
   function formatCount(num) {
     if (!num) return "0";
-    if (num >= 1000000) return (num / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
-    if (num >= 1000) return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
-    return num.toLocaleString();
+    return num.toLocaleString(); 
   }
 </script>
 
@@ -629,7 +629,7 @@ window.onload = function () {
     player.on('exitfullscreen', async () => {
       try { if (screen.orientation && screen.orientation.unlock) { await screen.orientation.unlock(); } } catch (err) { console.warn('Orientation unlock not supported', err); }
     });
-     if (window.screen && window.screen.orientation) {
+      if (window.screen && window.screen.orientation) {
        window.screen.orientation.addEventListener('change', () => {
           const type = window.screen.orientation.type;
           if (type.includes('landscape')) { if (!player.fullscreen.active) player.fullscreen.enter().catch(() => {}); } 
