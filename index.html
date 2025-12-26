@@ -35,7 +35,6 @@ body {
   background: var(--bg);
   color: var(--text);
   transition: background 0.3s ease, color 0.3s ease;
-  /* Prevent horizontal scroll on mobile */
   overflow-x: hidden;
 }
 
@@ -47,7 +46,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px; /* Slightly less padding on mobile */
+  padding: 0 16px;
   position: sticky;
   top: 0;
   z-index: 100;
@@ -59,7 +58,7 @@ header {
   font-weight: 800;
 }
 
-/* ========== THEME SWITCH (Fixed Size) ========== */
+/* ========== THEME SWITCH ========== */
 .theme-switch {
   --toggle-size: 14px;
   --container-width: 5.625em;
@@ -229,24 +228,20 @@ header {
 /* ========== LAYOUT ========== */
 .main {
   display: grid;
-  /* Desktop: 75% video, 25% chat */
   grid-template-columns: 3fr 1fr;
   gap: 16px;
   padding: 16px;
   max-width: 1600px;
   margin: auto;
-  /* Prevent full-width on super large screens */
   width: 100%;
 }
 
-/* Stream Column */
 .stream-column {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-/* Video Card */
 .video-wrapper {
   background: var(--card);
   border-radius: 12px;
@@ -255,11 +250,10 @@ header {
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
-/* 16:9 RESPONSIVE RATIO (Crucial for Mobile) */
 .video-frame {
   position: relative;
   width: 100%;
-  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  padding-top: 56.25%;
 }
 
 .video-frame iframe {
@@ -270,7 +264,6 @@ header {
   border: none;
 }
 
-/* Video Info */
 .video-info {
   padding: 0 4px;
 }
@@ -287,15 +280,13 @@ header {
   line-height: 1.4;
 }
 
-/* Chat Card */
 .chat-wrapper {
   background: var(--card);
   border-radius: 12px;
   border: 1px solid var(--border);
   overflow: hidden;
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  /* Desktop default height (adjust if needed) */
-  height: 80vh; 
+  height: 80vh;
   max-height: 800px;
   min-height: 400px;
 }
@@ -306,27 +297,16 @@ header {
   border: none;
 }
 
-/* ========== MOBILE OPTIMIZATION ========== */
-/* Triggered when screen is smaller than 900px (Tablets & Phones) */
+/* ========== MOBILE ========== */
 @media (max-width: 900px) {
   .main {
-    /* Stack Video on top of Chat */
-    grid-template-columns: 1fr; 
-    padding: 10px; /* Smaller padding */
+    grid-template-columns: 1fr;
+    padding: 10px;
     gap: 20px;
   }
 
-  /* Make chat tall enough on mobile */
   .chat-wrapper {
-    height: 500px; /* Give chat plenty of vertical space */
-  }
-
-  .video-title {
-    font-size: 18px;
-  }
-
-  .logo {
-    font-size: 25px;
+    height: 500px;
   }
 }
 </style>
@@ -362,22 +342,20 @@ header {
 <div class="main">
 
   <div class="stream-column">
-    
     <div class="video-wrapper">
       <div class="video-frame">
-        <iframe src="https://dlive.tv/livestream_101" allowfullscreen></iframe>
+        <iframe src="https://dlive.tv/embed/stream/DLIVE_USERNAME" allowfullscreen></iframe>
       </div>
     </div>
 
     <div class="video-info">
-      <div class="video-title">test stream</div>
+      <div class="video-title">Your Stream Title Here</div>
       <div class="video-desc">Optional stream description or status</div>
     </div>
-
   </div>
 
   <div class="chat-wrapper">
-    <iframe src="https://dlive.tv/livestream_101/chat"></iframe>
+    <iframe src="https://dlive.tv/embed/chat/DLIVE_USERNAME"></iframe>
   </div>
 
 </div>
