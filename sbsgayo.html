@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIVESTREAM101 - VOD Page</title>
+
+<link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+
+<style>
+/* =========================================
+   CORE STYLES
+   ========================================= */
+:root {
+  --bg: #f9f9f9; --header: #ffffff; --card: #ffffff; --text: #0f0f0f;
+  --muted: #606060; --border: #e0e0e0; --accent: #ff4757;
+  --sidebar-width: 280px;
+  --smooth-ease: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.dark {
+  --bg: #0f0f0f; --header: #181818; --card: #181818; --text: #f1f1f1;
+  --muted: #aaaaaa; --border: #2a2a2a;
+}
+
+* { box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  transition: background 0.3s var(--smooth-ease), color 0.3s var(--smooth-ease); 
+  overflow-x: hidden;
+}
+
+/* HEADER */
+header {
+  height: 64px; background: var(--header); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; padding: 0 20px;
+  position: sticky; top: 0; z-index: 100;
+  transition: background 0.3s var(--smooth-ease), border-color 0.3s var(--smooth-ease);
+}
+.header-left { display: flex; align-items: center; gap: 15px; }
+.hamburger-btn {
+  background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text);
+  padding: 5px; display: flex; align-items: center; justify-content: center;
+  border-radius: 4px; transition: background 0.2s ease;
+}
+.hamburger-btn:hover { background: rgba(128,128,128, 0.1); }
+.logo { font-size: 24px; font-weight: 800; }
+
+/* SIDEBAR */
+.sidebar {
+  position: fixed; top: 0; left: calc(-1 * var(--sidebar-width));
+  width: var(--sidebar-width); height: 100vh;
+  background: var(--card); z-index: 200;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; padding: 20px;
+  box-shadow: 4px 0 15px rgba(0,0,0,0.1);
+  transition: left 0.4s var(--smooth-ease);
+}
+.sidebar.active { left: 0; }
+.sidebar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+.close-btn { background: none; border: none; font-size: 24px; color: var(--text); cursor: pointer; }
+.nav-link {
+  display: block; width: 100%; padding: 12px 15px; margin-bottom: 10px;
+  background: transparent; color: var(--text); text-decoration: none;
+  border-radius: 8px; font-weight: 600; border: 1px solid var(--border);
+  text-align: left; transition: background 0.2s ease; cursor: pointer;
+}
+.nav-link:hover { background: rgba(128,128,128, 0.1); }
+.sidebar-bottom-section { margin-top: auto; padding-top: 20px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 15px; }
+.sidebar-theme-label { font-size: 0.9em; color: var(--muted); font-weight: 600; text-align: center; }
+
+/* OVERLAYS & MODALS */
+.overlay {
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.5); z-index: 150; opacity: 0;
+  pointer-events: none; transition: opacity 0.4s var(--smooth-ease);
+  backdrop-filter: blur(2px);
+}
+.overlay.active { opacity: 1; pointer-events: auto; }
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 300; background: rgba(0,0,0,0.6);
+  display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.3s var(--smooth-ease);
+  backdrop-filter: blur(5px); padding: 20px;
+}
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-card {
+  background: var(--card); color: var(--text); border-radius: 16px;
+  width: 100%; max-width: 700px; max-height: 85vh; display: flex; flex-direction: column;
+  transform: scale(0.9); transition: transform 0.3s var(--smooth-ease);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2); border: 1px solid var(--border);
+}
+.modal-overlay.active .modal-card { transform: scale(1); }
+.modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-title { font-size: 1.5rem; font-weight: 800; margin: 0; }
+.modal-body { padding: 25px; color: var(--muted); line-height: 1.6; overflow-y: auto; }
+.modal-footer { padding: 15px 25px; border-top: 1px solid var(--border); text-align: right; }
+.modal-close-btn { background: var(--accent); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.modal-close-btn:hover { background: #e04050; }
+
+/* THEME SWITCH */
+.theme-switch { --toggle-size: 14px; --container-width: 5.625em; --container-height: 2.5em; --container-radius: 6.25em; --container-light-bg: #3D7EAE; --container-night-bg: #1D1F2C; --circle-container-diameter: 3.375em; --sun-moon-diameter: 2.125em; --sun-bg: #ECCA2F; --moon-bg: #C4C9D1; --spot-color: #959DB1; --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / -2); --stars-color: #fff; --clouds-color: #F3FDFF; --back-clouds-color: #AACADF; --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25); --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17); }
+.theme-switch, .theme-switch * { box-sizing: border-box; margin: 0; padding: 0; font-size: var(--toggle-size); }
+.theme-switch__container { width: var(--container-width); height: var(--container-height); background-color: var(--container-light-bg); border-radius: var(--container-radius); overflow: hidden; cursor: pointer; position: relative; transition: var(--transition); margin: 0 auto; }
+.theme-switch__checkbox { display: none; }
+.theme-switch__circle-container { width: var(--circle-container-diameter); height: var(--circle-container-diameter); background-color: rgba(255, 255, 255, 0.1); position: absolute; left: var(--circle-container-offset); top: var(--circle-container-offset); border-radius: var(--container-radius); display: flex; transition: var(--circle-transition); pointer-events: none; }
+.theme-switch__sun-moon-container { position: relative; z-index: 2; width: var(--sun-moon-diameter); height: var(--sun-moon-diameter); margin: auto; border-radius: var(--container-radius); background-color: var(--sun-bg); overflow: hidden; transition: var(--transition); }
+.theme-switch__moon { transform: translateX(100%); width: 100%; height: 100%; background-color: var(--moon-bg); border-radius: inherit; transition: var(--transition); position: relative; }
+.theme-switch__clouds { width: 1.25em; height: 1.25em; background-color: var(--clouds-color); border-radius: var(--container-radius); position: absolute; bottom: -0.625em; left: 0.312em; transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25); }
+.theme-switch__stars-container { position: absolute; color: var(--stars-color); top: -100%; left: 0.312em; width: 2.75em; height: auto; transition: var(--transition); }
+.theme-switch__spot { position: absolute; top: 0.75em; left: 0.312em; width: 0.75em; height: 0.75em; border-radius: var(--container-radius); background-color: var(--spot-color); }
+.theme-switch__spot:nth-of-type(2) { width: 0.375em; height: 0.375em; top: 0.937em; left: 1.375em; }
+.theme-switch__spot:nth-last-of-type(3) { width: 0.25em; height: 0.25em; top: 0.312em; left: 0.812em; }
+.theme-switch__checkbox:checked + .theme-switch__container { background-color: var(--container-night-bg); }
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container { left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter)); }
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon { transform: translate(0); }
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds { bottom: -4.062em; }
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container { top: 50%; transform: translateY(-50%); }
+
+/* MAIN LAYOUT - SINGLE COLUMN */
+.main {
+  /* Changed to single column since there is no chat */
+  display: block;
+  padding: 16px;
+  max-width: 1400px;
+  margin: auto;
+  width: 100%;
+}
+
+.stream-column { display: flex; flex-direction: column; gap: 12px; }
+
+/* VIDEO AREA */
+.video-wrapper { background: var(--card); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+.video-frame { position: relative; width: 100%; padding-top: 56.25%; }
+
+/* VIDEO.JS CUSTOM STYLE */
+.video-js { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+/* Hide big play button when playing */
+.vjs-has-started .vjs-big-play-button { display: none; }
+
+/* DESCRIPTION */
+.video-info { padding: 0 4px; margin-top: 12px; }
+.video-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; }
+.desc-container { position: relative; max-height: 40px; overflow: hidden; transition: max-height 0.5s var(--smooth-ease); }
+.desc-container.expanded { max-height: 500px; }
+.video-desc { font-size: 16px; color: var(--muted); line-height: 1.5; }
+.desc-toggle-btn { background: none; border: none; color: var(--muted); font-size: 14px; cursor: pointer; padding: 5px 0; display: flex; align-items: center; gap: 5px; margin-top: 5px; font-weight: 600; }
+.desc-toggle-btn:hover { color: var(--accent); }
+.desc-arrow { display: inline-block; transition: transform 0.3s ease; font-size: 12px; }
+.desc-container.expanded + .desc-toggle-btn .desc-arrow { transform: rotate(180deg); }
+
+@media (max-width: 900px) {
+  .main { padding: 10px; }
+  .video-title { font-size: 20px; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay" id="myOverlay" onclick="closeSidebar()"></div>
+
+
+<div class="sidebar" id="mySidebar">
+  <div class="sidebar-header">
+    <div class="logo" style="font-size: 20px;">Menu</div>
+    <button class="close-btn" onclick="closeSidebar()">×</button>
+  </div>
+
+   <button class="nav-link" onclick="window.location.href='index.html'">Home</button>
+  <button class="nav-link" onclick="window.location.href='sbsgayo.html'">SBS 2025 GAYO DAJEON</button>
+
+  <div class="sidebar-bottom-section">
+
+    
+    <div class="sidebar-theme-label">Theme Mode</div>
+    <label class="theme-switch">
+      <input type="checkbox" class="theme-switch__checkbox" id="themeToggle">
+      <div class="theme-switch__container">
+        <div class="theme-switch__clouds"></div>
+        <div class="theme-switch__stars-container">
+          <svg width="100%" height="100%" viewBox="0 0 144 55" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M138.51 10.1265L139.559 12.3397L141.777 13.4357L139.559 14.5317L138.51 16.7449L137.461 14.5317L135.242 13.4357L137.461 12.3397L138.51 10.1265ZM109.916 38.312L111.45 41.547L114.693 43.1493L111.45 44.7516L109.916 47.9866L108.382 44.7516L105.139 43.1493L108.382 41.547L109.916 38.312ZM123.676 25.1069L124.632 27.1234L126.654 28.1221L124.632 29.1208L123.676 31.1373L122.72 29.1208L120.699 28.1221L122.72 27.1234L123.676 25.1069ZM31.1448 8.87532L32.1934 11.0885L34.4118 12.1845L32.1934 13.2805L31.1448 15.4937L30.0962 13.2805L27.8778 12.1845L30.0962 11.0885L31.1448 8.87532ZM13.8824 23.3601L14.931 25.5732L17.1495 26.6693L14.931 27.7653L13.8824 29.9785L12.8338 27.7653L10.6154 26.6693L12.8338 25.5732L13.8824 23.3601ZM21.9213 37.108L22.655 38.6565L24.2073 39.4234L22.655 40.1903L21.9213 41.7388L21.1876 40.1903L19.6353 39.4234L21.1876 38.6565L21.9213 37.108Z" fill="white"/></svg>
+        </div>
+        <div class="theme-switch__circle-container">
+          <div class="theme-switch__sun-moon-container">
+            <div class="theme-switch__moon">
+              <div class="theme-switch__spot"></div><div class="theme-switch__spot"></div><div class="theme-switch__spot"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </label>
+  </div>
+</div>
+
+<header>
+  <div class="header-left">
+    <button class="hamburger-btn" onclick="openSidebar()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+    </button>
+    <div class="logo">LIVESTREAM101</div>
+  </div>
+  <div></div>
+</header>
+
+<div class="main">
+  <div class="stream-column">
+    
+    <div class="video-wrapper">
+      <div class="video-frame">
+        <video-js id="my-video" class="video-js vjs-default-skin vjs-big-play-centered" controls preload="auto" poster="https://via.placeholder.com/1920x1080">
+            <source src="https://playback.prd.dlivecdn.com/live/dlive-higzikgeev/1766649001/src/playback.m3u8" type="video/mp4" />
+        </video-js>
+      </div>
+    </div>
+
+    <div class="video-info">
+      <div class="video-title">SBS 2025 GAYO DAEJEON</div>
+      <div class="desc-container" id="desc-box">
+          <div class="video-desc">
+          </div>
+      </div>
+      <button class="desc-toggle-btn" onclick="toggleDescription()">Show More <span class="desc-arrow">▼</span></button>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+
+<script>
+// --- VIDEO PLAYER INIT ---
+var player = videojs('my-video', {
+    fluid: true,
+    responsive: true
+});
+
+// --- SIDEBAR LOGIC ---
+function openSidebar() { document.getElementById("mySidebar").classList.add("active"); document.getElementById("myOverlay").classList.add("active"); }
+function closeSidebar() { document.getElementById("mySidebar").classList.remove("active"); document.getElementById("myOverlay").classList.remove("active"); }
+
+// --- MODAL LOGIC ---
+function openAboutModal() { document.getElementById('aboutModal').classList.add('active'); closeSidebar(); }
+function closeAboutModal() { document.getElementById('aboutModal').classList.remove('active'); }
+
+// --- DESCRIPTION TOGGLE ---
+function toggleDescription() { 
+    const c = document.getElementById('desc-box');
+    const b = document.querySelector('.desc-toggle-btn');
+    c.classList.toggle('expanded');
+    b.innerHTML = c.classList.contains('expanded') ? 'Show Less <span class="desc-arrow" style="transform:rotate(180deg)">▼</span>' : 'Show More <span class="desc-arrow">▼</span>';
+}
+
+// --- THEME SWITCH ---
+const toggle = document.getElementById("themeToggle");
+if (localStorage.getItem("theme") === "dark") { document.body.classList.add("dark"); toggle.checked = true; }
+toggle.addEventListener("change", () => {
+  if (toggle.checked) { document.body.classList.add("dark"); localStorage.setItem("theme", "dark"); }
+  else { document.body.classList.remove("dark"); localStorage.setItem("theme", "light"); }
+});
+</script>
+</body>
+</html>
