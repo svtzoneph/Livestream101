@@ -2,918 +2,404 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Live | Zone Vault</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script> 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
-<link rel="icon" href="favicon-new.png" type="image/png" />
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#000000">
-
-<meta name="apple-mobile-web-app-title" content="Zone Vault">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" sizes="192x192" href="favicon-new.png">
-<link rel="apple-touch-icon" sizes="512x512" href="favicon-new.png">
-<link rel="apple-touch-startup-image" href="splash.png">
-
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-1B2RJ659GL"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-1B2RJ659GL');
-</script>
-
-<script>
-  (function() {
-    const savedTheme = localStorage.getItem('zoneVaultTheme');
-    if(savedTheme) {
-      const style = document.createElement('style');
-      style.innerHTML = `
-        body { 
-          background: ${savedTheme} !important; 
-          background-size: cover !important;
-          background-attachment: fixed !important;
-          background-repeat: no-repeat !important;
-          min-height: 100vh;
-        }
-      `;
-      document.head.appendChild(style);
-    }
-  })();
-</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIVESTREAM101</title>
 
 <style>
-  /* --- CSS VARIABLES --- */
-  :root {
-      --glass-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
-      --glass-border: 1px solid rgba(255, 255, 255, 0.2);
-      --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      --glass-blur: blur(20px);
-      --text-shadow: 0 1px 2px rgba(0,0,0,0.8);
-      --plyr-color-main: #ff0033; /* Red Accent */
-  }
-
-  * { box-sizing: border-box; }
-
-  html, body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-  }
-
-  body {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    background: black; 
-    text-align: center;
-    padding-top: 20px; 
-    padding-bottom: 20px;
-    transition: background 0.5s ease;
-  }
-
-  /* --- MODAL STYLES --- */
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(15px);
-    z-index: 99999; /* Highest priority */
-    display: flex; /* Hidden via JS later */
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    opacity: 1;
-    transition: opacity 0.5s ease;
-  }
-  .modal-box {
-    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 30px;
-    border-radius: 16px;
-    width: 100%;
-    max-width: 400px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    text-align: center;
-  }
-  .modal-box h3 {
-    color: white; margin-top: 0; font-size: 22px; margin-bottom: 5px;
-  }
-  .modal-box p {
-    color: #aaa; font-size: 14px; margin-bottom: 20px;
-  }
-  .submit-btn {
-    width: 100%;
-    background: var(--plyr-color-main);
-    color: white;
-    border: none;
-    padding: 14px;
-    border-radius: 50px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: transform 0.2s, background 0.2s;
-  }
-  .submit-btn:hover { background: #d9002b; transform: scale(1.02); }
-
-  .main-layout {
-    max-width: 100%;
-    margin: 0 auto;
-    width: 100%;
-    padding: 0 20px; 
-  }
-
-  .video-wrapper-left {
-    width: 100%;
-    position: relative; 
-  }
-
-  #poster-container {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background-size: cover;
-    background-position: center;
-    background-image: url('https://raw.githubusercontent.com/svtzoneph/gallery/main/images/website/new-tour.png'); 
-    border-radius: 0px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    position: relative;
-    box-shadow: var(--glass-shadow);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  #poster-overlay {
-    background: rgba(0, 0, 0, 0.5); 
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-top: 1px solid rgba(255, 255, 255, 0.5);
-    padding: 15px 25px;
-    border-radius: 50px;
-    color: white;
-    font-weight: bold;
-    font-size: 18px;
-    pointer-events: none; 
-    max-width: 90%;
-    text-align: center;
-    margin: 0 auto;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    text-shadow: var(--text-shadow);
-    transform: translateZ(0);
-    will-change: transform, backdrop-filter;
-  }
-
-  #player-container {
-    display: none; 
-    width: 100%;
-    box-shadow: var(--glass-shadow);
-    position: relative; 
-  }
-
-  h2 {
-    font-size: 24px;
-    color: white;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-align: left; 
-    text-shadow: var(--text-shadow);
-  }
-
-  /* --- LINEUP BOX STYLES --- */
-  .lineup-box {
-    margin-top: 20px;
-    background: rgba(20, 20, 20, 0.6);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    color: white;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-  }
-
-  .lineup-header {
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--plyr-color-main);
-    margin-bottom: 5px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-  }
-
-  .lineup-schedule {
-    font-size: 14px;
-    color: #ccc;
-    margin-bottom: 15px;
-    font-weight: 500;
-  }
-
-  /* COUNTDOWN TIMER STYLES */
-  .countdown-container {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
-    max-width: 400px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  .timer-block {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    padding: 8px;
-  }
-  .timer-number {
-    font-size: 20px;
-    font-weight: 800;
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  .timer-label {
-    font-size: 10px;
-    color: #aaa;
-    text-transform: uppercase;
-  }
-
-  .lineup-content {
-    font-size: 14px;
-    line-height: 1.8;
-    color: #e0e0e0;
-    font-weight: 400;
-  }
-  .lineup-content span {
-    color: var(--plyr-color-main);
-    font-weight: bold;
-    margin: 0 4px;
-  }
-
-  /* --- MOBILE PORTRAIT (Standard View) --- */
-  @media (max-width: 768px) {
-    body { padding: 10px 0 !important; }
-    .main-layout { padding: 0 15px !important; }
-    h2 { font-size: 18px; }
-    #poster-overlay { font-size: 14px; padding: 10px 15px; border-radius: 35px; border-width: 1px; }
-    .center-logo { margin-top: 15px; }
-    .center-logo img { width: 40px; }
-    .lineup-content { font-size: 13px; }
-  }
-
-  /* --- 🚀 MOBILE LANDSCAPE ONLY --- */
-  @media screen and (max-width: 915px) and (orientation: landscape) {
-    #player-container, #poster-container {
-        position: fixed !important; top: 0 !important; left: 0 !important;
-        width: 100vw !important; height: 100vh !important;
-        z-index: 9999 !important; background: black !important;
-        margin: 0 !important; border-radius: 0 !important; border: none !important;
-    }
-    .plyr { width: 100% !important; height: 100% !important; }
-    video { width: 100% !important; height: 100% !important; object-fit: contain !important; }
-    .mobile-header, .center-logo, .lineup-box { display: none !important; }
-    .video-wrapper-left { height: 100vh; }
-    #views-display, #main-title { display: none !important; }
-  }
-
-  .center-logo { display: flex; justify-content: center; margin-bottom: 20px; }
-  .center-logo img { width: 50px; height: auto; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
-
-  .plyr {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: #000;
-    border-radius: 0px;
-    overflow: hidden;
-  }
-      
-  video { width: 100%; }
-
-/* --- REALISTIC STREAMING CONTROLS --- */
-.plyr__controls {
-  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0) 100%) !important;
-  padding: 20px 15px !important;
-  display: flex !important;
-  align-items: center;
-  position: relative; 
-  z-index: 50 !important;
+/* ========== THEME COLORS ========== */
+:root {
+  --bg: #f9f9f9;
+  --header: #ffffff;
+  --card: #ffffff;
+  --text: #0f0f0f;
+  --muted: #606060;
+  --border: #e0e0e0;
 }
-.plyr__volume { margin-left: auto !important; }
-.plyr__time {
+
+body.dark {
+  --bg: #0f0f0f;
+  --header: #181818;
+  --card: #181818;
+  --text: #f1f1f1;
+  --muted: #aaaaaa;
+  --border: #2a2a2a;
+}
+
+* {
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.3s ease, color 0.3s ease;
+  /* Prevent horizontal scroll on mobile */
+  overflow-x: hidden;
+}
+
+/* ========== HEADER ========== */
+header {
+  height: 64px;
+  background: var(--header);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px; /* Slightly less padding on mobile */
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+/* ========== THEME SWITCH (Fixed Size) ========== */
+.theme-switch {
+  --toggle-size: 14px;
+  --container-width: 5.625em;
+  --container-height: 2.5em;
+  --container-radius: 6.25em;
+  --container-light-bg: #3D7EAE;
+  --container-night-bg: #1D1F2C;
+  --circle-container-diameter: 3.375em;
+  --sun-moon-diameter: 2.125em;
+  --sun-bg: #ECCA2F;
+  --moon-bg: #C4C9D1;
+  --spot-color: #959DB1;
+  --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+  --stars-color: #fff;
+  --clouds-color: #F3FDFF;
+  --back-clouds-color: #AACADF;
+  --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+  --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+}
+
+.theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-size: var(--toggle-size);
+}
+
+.theme-switch__container {
+  width: var(--container-width);
+  height: var(--container-height);
+  background-color: var(--container-light-bg);
+  border-radius: var(--container-radius);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+  transition: var(--transition);
+  position: relative;
+}
+
+.theme-switch__container::before {
+  content: "";
   position: absolute;
+  z-index: 1;
+  inset: 0;
+  box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+  border-radius: var(--container-radius);
+}
+
+.theme-switch__checkbox { display: none; }
+
+.theme-switch__circle-container {
+  width: var(--circle-container-diameter);
+  height: var(--circle-container-diameter);
+  background-color: rgba(255, 255, 255, 0.1);
+  position: absolute;
+  left: var(--circle-container-offset);
+  top: var(--circle-container-offset);
+  border-radius: var(--container-radius);
+  box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+  display: flex;
+  transition: var(--circle-transition);
+  pointer-events: none;
+}
+
+.theme-switch__sun-moon-container {
+  pointer-events: auto;
+  position: relative;
+  z-index: 2;
+  width: var(--sun-moon-diameter);
+  height: var(--sun-moon-diameter);
+  margin: auto;
+  border-radius: var(--container-radius);
+  background-color: var(--sun-bg);
+  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+  filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.theme-switch__moon {
+  transform: translateX(100%);
+  width: 100%;
+  height: 100%;
+  background-color: var(--moon-bg);
+  border-radius: inherit;
+  box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+  transition: var(--transition);
+  position: relative;
+}
+
+.theme-switch__spot {
+  position: absolute;
+  top: 0.75em;
+  left: 0.312em;
+  width: 0.75em;
+  height: 0.75em;
+  border-radius: var(--container-radius);
+  background-color: var(--spot-color);
+  box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+}
+
+.theme-switch__spot:nth-of-type(2) {
+  width: 0.375em;
+  height: 0.375em;
+  top: 0.937em;
+  left: 1.375em;
+}
+
+.theme-switch__spot:nth-last-of-type(3) {
+  width: 0.25em;
+  height: 0.25em;
+  top: 0.312em;
+  left: 0.812em;
+}
+
+.theme-switch__clouds {
+  width: 1.25em;
+  height: 1.25em;
+  background-color: var(--clouds-color);
+  border-radius: var(--container-radius);
+  position: absolute;
+  bottom: -0.625em;
+  left: 0.312em;
+  box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+  transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+}
+
+.theme-switch__stars-container {
+  position: absolute;
+  color: var(--stars-color);
+  top: -100%;
+  left: 0.312em;
+  width: 2.75em;
+  height: auto;
+  transition: var(--transition);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container {
+  background-color: var(--container-night-bg);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+  left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em)
+}
+
+.theme-switch__circle-container:hover {
+  left: calc(var(--circle-container-offset) + 0.187em);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+  transform: translate(0);
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+  bottom: -4.062em;
+}
+
+.theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
   top: 50%;
   transform: translateY(-50%);
-  font-family: 'Roboto Mono', 'Courier New', monospace;
+}
+
+/* ========== LAYOUT ========== */
+.main {
+  display: grid;
+  /* Desktop: 75% video, 25% chat */
+  grid-template-columns: 3fr 1fr;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1600px;
+  margin: auto;
+  /* Prevent full-width on super large screens */
+  width: 100%;
+}
+
+/* Stream Column */
+.stream-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Video Card */
+.video-wrapper {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* 16:9 RESPONSIVE RATIO (Crucial for Mobile) */
+.video-frame {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+}
+
+.video-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Video Info */
+.video-info {
+  padding: 0 4px;
+}
+
+.video-title {
+  font-size: 20px;
   font-weight: 700;
-  font-size: 14px;
-  color: rgba(255,255,255,0.95);
-  text-shadow: 0 2px 2px rgba(0,0,0,0.8);
-  pointer-events: none; 
-  margin: 0 !important;
+  margin-bottom: 6px;
 }
-.plyr__time--current { left: 50%; transform: translate(-100%, -50%); padding-right: 5px; }
-.plyr__time--duration { left: 50%; transform: translate(0, -50%); padding-left: 5px; }
-.plyr__time--duration::before { content: "/"; position: absolute; left: -4px; color: rgba(255,255,255,0.5); }
-.plyr__control {
-  background: transparent;
-  border-radius: 8px !important;
-  transition: transform 0.2s ease, background 0.2s ease;
-  padding: 7px !important;
-}
-.plyr__control:hover { background: rgba(255, 255, 255, 0.2) !important; transform: scale(1.15); }
-.plyr__control svg { filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
-.plyr__control--overlaid {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255,255,255,0.4);
-  backdrop-filter: blur(8px);
-  width: 70px; height: 70px;
-  box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-}
-.plyr__control--overlaid:hover {
-  background: var(--plyr-color-main) !important;
-  border-color: var(--plyr-color-main);
-  transform: scale(1.1);
-}
-.plyr__captions {
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  text-shadow: 0 0 4px black, 0 0 8px black;
-  padding-bottom: 60px !important; 
-}
-.plyr__caption { background: transparent !important; }
 
-  /* --- GLASSMORPHISM SEEK OVERLAY --- */
-  .seek-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.9);
-    opacity: 0;
-    pointer-events: none;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    background-color: rgba(0, 0, 0, 0.6);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 80px;
-    height: 80px;
-    z-index: 20; 
-    will-change: transform, opacity;
-  }
-  .seek-overlay.visible { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  .seek-overlay svg { width: 40px; height: 40px; fill: white; display: block; }
-      
-  .live-control-badge {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: rgba(255, 0, 0, 0.15);
-    border: 1px solid rgba(255, 0, 0, 0.4);
-    color: #ff4444;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-left: 10px;
-    pointer-events: none;
-    height: 24px;
-    user-select: none;
-  }
-  .live-dot {
-    width: 6px;
-    height: 6px;
-    background: #ff4444;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #ff4444;
-    animation: pulse 1.5s infinite;
-  }
-  @keyframes pulse {
-    0% { transform: scale(0.95); opacity: 0.7; }
-    50% { transform: scale(1.1); opacity: 1; }
-    100% { transform: scale(0.95); opacity: 0.7; }
+.video-desc {
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* Chat Card */
+.chat-wrapper {
+  background: var(--card);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  /* Desktop default height (adjust if needed) */
+  height: 80vh; 
+  max-height: 800px;
+  min-height: 400px;
+}
+
+.chat-wrapper iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* ========== MOBILE OPTIMIZATION ========== */
+/* Triggered when screen is smaller than 900px (Tablets & Phones) */
+@media (max-width: 900px) {
+  .main {
+    /* Stack Video on top of Chat */
+    grid-template-columns: 1fr; 
+    padding: 10px; /* Smaller padding */
+    gap: 20px;
   }
 
-  .player-overlay-title {
-    position: absolute;
-    top: 20px; 
-    left: 0; 
-    right: 0;
-    text-align: center;
-    color: white;
+  /* Make chat tall enough on mobile */
+  .chat-wrapper {
+    height: 500px; /* Give chat plenty of vertical space */
+  }
+
+  .video-title {
     font-size: 18px;
-    font-weight: 600;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    pointer-events: none;
-    z-index: 100;
-    opacity: 0;
-    transform: translateY(-10px);
-    transition: all 0.3s ease;
-    padding: 0 60px;
-  }
-  .player-overlay-title.visible { opacity: 1; transform: translateY(0); }
-  .buffering-overlay {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 50;
-    pointer-events: none;
-    display: none;
-  }
-  .buffering-overlay.visible { display: block; }
-  .spinner {
-    width: 50px;
-    height: 50px;
-    border: 5px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    border-top-color: var(--plyr-color-main);
-    animation: spin 1s ease-in-out infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* --- UPDATED VIEWS & DATE CONTAINER --- */
-  .views-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 8px;
-    margin-top: 15px; 
-    margin-bottom: 5px;
-    color: #a1a1a1;
-    font-family: 'Segoe UI', sans-serif;
-    font-size: 16px;
-    font-weight: 500;
-    opacity: 0; 
-    transition: opacity 0.5s ease;
-  }
-  .views-container.visible { opacity: 1; }
-  .views-icon { width: 18px; height: 18px; fill: #a1a1a1; }
-  #current-date-display { margin-left: 5px; font-size: 14px; color: #666; font-weight: 400; }
-
-  @media (max-width: 600px) {
-    .player-overlay-title { font-size: 10px; top: 15px; padding: 0 40px; }
-    .live-control-badge { font-size: 9px; padding: 1px 6px; height: 20px; margin-left: 6px; }
   }
 
-  @media (min-width: 900px) {
-    .main-layout {
-      display: flex; flex-direction: column; align-items: center;
-      gap: 10px; padding: 0 20px; text-align: left;
-    }
-    .video-wrapper-left { width: 100%; max-width: 1100px; margin: 0 auto; }
+  .logo {
+    font-size: 25px;
   }
+}
 </style>
 </head>
 
 <body>
 
-<div id="login-modal" class="modal-overlay">
-  <div class="modal-box">
-    <div style="margin-bottom: 20px;">
-        <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" width="60" style="border-radius: 10px;">
-    </div>
-    <h3>Welcome to Zone Vault</h3>
-    <p>Click below to enter the live stream.</p>
-    
-    <button id="modal-submit-btn" class="submit-btn">ENTER ZONE VAULT</button>
-  </div>
-</div>
+<header>
+  <div class="logo">LIVESTREAM101</div>
 
-<div class="center-logo">
-  <img src="https://uploads.onecompiler.io/43ddry4jt/43s3sjvch/Zone%20Vault%20logo.png" loading="lazy" alt="Zone Vault Logo">
-</div>
-
-<div class="main-layout">
-
-  <div class="video-wrapper-left">
-      
-    <div id="poster-container">
-      <div id="poster-overlay">Loading Live...</div>
-    </div>
-
-    <div id="player-container">
-      <div id="player-overlay-title" class="player-overlay-title"></div>
-      
-      <div id="buffering-overlay" class="buffering-overlay">
-        <div class="spinner"></div>
+  <label class="theme-switch">
+    <input type="checkbox" class="theme-switch__checkbox" id="themeToggle">
+    <div class="theme-switch__container">
+      <div class="theme-switch__clouds"></div>
+      <div class="theme-switch__stars-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 144 55" fill="none">
+           <path fill-rule="evenodd" clip-rule="evenodd" d="M138.51 10.1265L139.559 12.3397L141.777 13.4357L139.559 14.5317L138.51 16.7449L137.461 14.5317L135.242 13.4357L137.461 12.3397L138.51 10.1265ZM109.916 38.312L111.45 41.547L114.693 43.1493L111.45 44.7516L109.916 47.9866L108.382 44.7516L105.139 43.1493L108.382 41.547L109.916 38.312ZM123.676 25.1069L124.632 27.1234L126.654 28.1221L124.632 29.1208L123.676 31.1373L122.72 29.1208L120.699 28.1221L122.72 27.1234L123.676 25.1069ZM31.1448 8.87532L32.1934 11.0885L34.4118 12.1845L32.1934 13.2805L31.1448 15.4937L30.0962 13.2805L27.8778 12.1845L30.0962 11.0885L31.1448 8.87532ZM13.8824 23.3601L14.931 25.5732L17.1495 26.6693L14.931 27.7653L13.8824 29.9785L12.8338 27.7653L10.6154 26.6693L12.8338 25.5732L13.8824 23.3601ZM21.9213 37.108L22.655 38.6565L24.2073 39.4234L22.655 40.1903L21.9213 41.7388L21.1876 40.1903L19.6353 39.4234L21.1876 38.6565L21.9213 37.108Z" fill="white"></path>
+        </svg>
       </div>
-      
-      <div class="plyr__video-wrapper">
-        <video id="videoPlayer" playsinline controls crossorigin="anonymous"></video>
+      <div class="theme-switch__circle-container">
+        <div class="theme-switch__sun-moon-container">
+          <div class="theme-switch__moon">
+            <div class="theme-switch__spot"></div>
+            <div class="theme-switch__spot"></div>
+            <div class="theme-switch__spot"></div>
+          </div>
+        </div>
       </div>
     </div>
+  </label>
+</header>
 
-    <div id="views-display" class="views-container">
-      <svg class="views-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      <span id="view-count-text">0</span>
-      <span id="current-date-display"></span>
-    </div>
+<div class="main">
 
-    <h2 id="main-title"></h2>
-
-    <div class="lineup-box">
-        <div class="lineup-header">2025 KBS Gayo Daechukje</div>
-        <div class="lineup-schedule">December 19, 2025 | Friday <br> 7:15PM KST / 6:15PM PHT</div>
-        
-        <div class="countdown-container">
-            <div class="timer-block">
-                <div class="timer-number" id="t-days">00</div>
-                <div class="timer-label">Days</div>
-            </div>
-            <div class="timer-block">
-                <div class="timer-number" id="t-hours">00</div>
-                <div class="timer-label">Hours</div>
-            </div>
-            <div class="timer-block">
-                <div class="timer-number" id="t-mins">00</div>
-                <div class="timer-label">Mins</div>
-            </div>
-            <div class="timer-block">
-                <div class="timer-number" id="t-secs">00</div>
-                <div class="timer-label">Secs</div>
-            </div>
-        </div>
-
-        <div class="lineup-content">
-            NCT DREAM • MARK • HAECHAN • AHOF • P1HARMONY • THE BOYZ • tripleS • aespa • LE SSERAFIM • KISS OF LIFE • n.SSign • EVNNE • CLOSE YOUR EYES • HITGS • Baby DONT Cry • fromis_9 • STAYC • LOVELYZ • DAYOUNG • CNBLUE • LEE CHANWON • PARK SEOJIN • 10CM • ROY KIM • JANNABI
-        </div>
-    </div>
+  <div class="stream-column">
     
+    <div class="video-wrapper">
+      <div class="video-frame">
+        <iframe src="https://dlive.tv/livestream_101" allowfullscreen></iframe>
+      </div>
+    </div>
+
+    <div class="video-info">
+      <div class="video-title">test stream</div>
+      <div class="video-desc">Optional stream description or status</div>
+    </div>
+
   </div>
-  
-  </div> 
 
-<script>
-// --- 1. CONFIGURATION & DATA ---
-const playlistData = [
-  { 
-    id: "1", 
-    title: "2025 KBS Gayo Daechukje", 
-    status: "Live", // THIS ONE WILL AUTOPLAY
-    date: "December 19, 2025 6:15 PM",
-    image: "",
-  }
-];
+  <div class="chat-wrapper">
+    <iframe src="https://dlive.tv/livestream_101/chat"></iframe>
+  </div>
 
-const posterContainer = document.getElementById('poster-container');
-const playerContainer = document.getElementById('player-container');
-const mainTitle = document.getElementById('main-title');
-const overlayTitle = document.getElementById('player-overlay-title'); 
-const currentDateDisplay = document.getElementById('current-date-display');
-const bufferingOverlay = document.getElementById('buffering-overlay');
-const viewsDisplay = document.getElementById('views-display');
-const viewCountText = document.getElementById('view-count-text');
-
-let currentViewListenerRef = null;
-let currentPresenceRef = null; 
-window.currentEpData = null;
-window.currentUserXID = null; 
-</script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyAs2S6iRhnYhmqNuF0QCCYu5NuzxHxIRv0",
-  authDomain: "tvnstream-b4497.firebaseapp.com",
-  databaseURL: "https://tvnstream-b4497-default-rtdb.firebaseio.com",
-  projectId: "tvnstream-b4497",
-  storageBucket: "tvnstream-b4497.appspot.com",
-  messagingSenderId: "308384754214",
-  appId: "1:308384754214:web:2938e76cd29b288f75d4e7",
-};
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(); 
-const db = firebase.database();
-
-// --- MODAL & LOGIN LOGIC ---
-document.addEventListener('DOMContentLoaded', () => {
-    const modal = document.getElementById('login-modal');
-    const submitBtn = document.getElementById('modal-submit-btn');
-
-    // COUNTDOWN TIMER LOGIC
-    const targetDate = new Date("2025-12-19T18:15:00+08:00").getTime(); // PHT Timezone (UTC+8)
-
-    function updateTimer() {
-        const now = new Date().getTime();
-        const distance = targetDate - now;
-
-        if (distance < 0) {
-            document.getElementById("t-days").innerText = "00";
-            document.getElementById("t-hours").innerText = "00";
-            document.getElementById("t-mins").innerText = "00";
-            document.getElementById("t-secs").innerText = "00";
-            return;
-        }
-
-        const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById("t-days").innerText = days < 10 ? "0" + days : days;
-        document.getElementById("t-hours").innerText = hours < 10 ? "0" + hours : hours;
-        document.getElementById("t-mins").innerText = minutes < 10 ? "0" + minutes : minutes;
-        document.getElementById("t-secs").innerText = seconds < 10 ? "0" + seconds : seconds;
-    }
-    
-    setInterval(updateTimer, 1000);
-    updateTimer();
-
-
-    // --- 💾 CHECK SAVED DATA FIRST ---
-    const savedX = localStorage.getItem('zv_x_username');
-    
-    if (savedX) {
-        modal.style.display = 'none';
-        window.currentUserXID = savedX;
-        startApp(); 
-    } else {
-        modal.style.display = 'flex';
-    }
-
-    // MODIFIED SUBMIT LISTENER - NO VALIDATION
-    submitBtn.addEventListener('click', () => {
-        const xVal = "Guest_" + Math.floor(Math.random() * 10000);
-
-        localStorage.setItem('zv_x_username', xVal);
-
-        window.currentUserXID = xVal;
-        
-        const safeId = xVal.replace(/[.#$[\]]/g, "_");
-        db.ref('users/' + safeId).set({
-            x_username: xVal,
-            tg_username: "Not Provided",
-            last_login: Date.now()
-        });
-
-        modal.style.opacity = '0';
-        setTimeout(() => { modal.style.display = 'none'; }, 500);
-        startApp();
-    });
-});
-
-function startApp() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const videoId = urlParams.get('v');
-    
-    if (videoId) {
-        setTimeout(() => { loadAndPlayEpisode(videoId, false); }, 500);
-    } else {
-        const liveEp = playlistData.find(ep => ep.status && ep.status.toLowerCase() === 'live');
-        if (liveEp) {
-             console.log("Autoplaying LIVE episode:", liveEp.title);
-             setTimeout(() => { loadAndPlayEpisode(liveEp.id, false); }, 800);
-        }
-    }
-    
-    if(currentDateDisplay) {
-        const now = new Date();
-        currentDateDisplay.textContent = " • " + now.toLocaleTimeString('en-US', { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
-    }
-}
-
-function smartGoBack() {
-    if (document.referrer && window.history.length > 1) window.history.back();
-    else window.location.href = 'videos.html';
-}
-
-const video = document.getElementById("videoPlayer");
-let hls;
-let player = null;
-
-const defaultPlyrOptions = {
-  captions: { active: true, update: true, language: "en" },
-  controls: ['play-large', 'play', 'mute', 'settings', 'fullscreen'],
-  settings: ["captions","speed","quality"],
-  clickToPlay: false, 
-  dblclickFullscreen: false,
-  i18n: { quality: 'Quality', qualityBadge: { 2160: '4K', 1440: 'HD', 1080: 'HD', 720: 'HD', 576: 'SD', 480: 'SD' } }
-};
-
-function loadAndPlayEpisode(epId, updateUrl = true) {
-    const ep = playlistData.find(item => item.id === epId);
-    if (!ep) return;
-
-    if (updateUrl) {
-        const titleSlug = ep.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-        let newUrl = window.location.pathname + `?v=${ep.id}&session=${Date.now()}&title=${titleSlug}`;
-        history.pushState({id: ep.id}, '', newUrl);
-    }
-
-    window.currentEpData = ep;
-    if(overlayTitle) overlayTitle.textContent = ep.title;
-    if(mainTitle) mainTitle.textContent = ep.title;
-
-    posterContainer.style.display = "none";
-    playerContainer.style.display = "block";
-
-    if (currentPresenceRef) { currentPresenceRef.remove(); currentPresenceRef.onDisconnect().cancel(); currentPresenceRef = null; }
-    if (currentViewListenerRef) { currentViewListenerRef.off(); }
-
-    const rawId = window.currentUserXID || "Anonymous";
-    const viewerId = rawId.replace(/[.#$[\]]/g, "_"); 
-
-    // WATERMARK LOGIC REMOVED HERE
-
-    currentPresenceRef = db.ref(`active_viewers/${epId}/${viewerId}`);
-    currentPresenceRef.onDisconnect().remove();
-    currentPresenceRef.set({ 
-        timestamp: firebase.database.ServerValue.TIMESTAMP, 
-        device: navigator.userAgent,
-        x_handle: rawId
-    });
-
-    currentViewListenerRef = db.ref(`active_viewers/${epId}`);
-    currentViewListenerRef.on('value', (snapshot) => {
-        const viewersData = snapshot.val();
-        const count = viewersData ? Object.keys(viewersData).length : 0;
-        viewCountText.textContent = new Intl.NumberFormat().format(count);
-        viewsDisplay.classList.add('visible');
-    });
-
-    const directStreamUrl = "https://hnd-prod-catalyst-0.lp-playback.studio/hls/video+60b6bg3vdf9eb8uz/index.m3u8?tkn=7b29bc0509b1a";
-    setupStream(directStreamUrl, ep.status);
-}
-
-function setupStream(streamUrl, status) {
-    const resumePlayback = () => {
-        updatePlayerLiveBadge(status);
-        var playPromise = player.play();
-        if (playPromise !== undefined) {
-            playPromise.then(_ => {
-                player.muted = false; 
-            }).catch(error => {
-                player.muted = true;
-                player.play();
-            });
-        }
-    };
-
-    if(typeof Hls !== 'undefined' && Hls.isSupported()){
-        if(hls) hls.destroy();
-        hls = new Hls();
-        hls.loadSource(streamUrl);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function (event, data) {
-            const availableQualities = hls.levels.map((l) => l.height);
-            availableQualities.unshift(0);
-            const newOptions = Object.assign({}, defaultPlyrOptions);
-            newOptions.quality = {
-                default: 0, 
-                options: availableQualities,
-                forced: true,
-                onChange: (newQuality) => {
-                    if (newQuality === 0) hls.currentLevel = -1; 
-                    else hls.levels.forEach((level, idx) => { if (level.height === newQuality) hls.currentLevel = idx; });
-                }
-            };
-            if(player) player.destroy();
-            player = new Plyr(video, newOptions);
-            attachPlayerEvents();
-            setTimeout(resumePlayback, 100);
-        });
-    } else {
-        video.src = streamUrl;
-        if(player) player.destroy();
-        player = new Plyr(video, defaultPlyrOptions);
-        attachPlayerEvents();
-        video.addEventListener('loadedmetadata', resumePlayback, { once: true });
-    }
-}
-
-function updatePlayerLiveBadge(status) {
-    if (!player || !player.elements || !player.elements.controls) return;
-    const controls = player.elements.controls;
-    let badge = controls.querySelector('.live-control-badge');
-    if(status && status.toUpperCase() === 'LIVE') {
-        if(!badge) {
-            badge = document.createElement('div');
-            badge.className = 'live-control-badge';
-            badge.innerHTML = '<span class="live-dot"></span>LIVE';
-            const playBtn = controls.querySelector('[data-plyr="play"]');
-            if(playBtn) playBtn.after(badge); else controls.insertBefore(badge, controls.firstChild);
-        }
-        badge.style.display = 'flex';
-    } else { if(badge) badge.style.display = 'none'; }
-}
-
-window.addEventListener('popstate', (event) => {
-    if (event.state && event.state.id) loadAndPlayEpisode(event.state.id, false);
-    else { posterContainer.style.display = "flex"; playerContainer.style.display = "none"; if(player) player.pause(); }
-});
-
-const isMobileOrTablet = /Mobi|Android|iPad|Tablet/i.test(navigator.userAgent);
-
-function attachPlayerEvents() {
-    if(!player) return;
-    player.on('enterfullscreen', () => { if (isMobileOrTablet && screen.orientation) screen.orientation.lock('landscape').catch(()=>{}); });
-    player.on('exitfullscreen', () => { if (isMobileOrTablet && screen.orientation) screen.orientation.unlock(); });
-    player.on('waiting', () => { if (bufferingOverlay) bufferingOverlay.classList.add('visible'); });
-    player.on('playing', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
-    player.on('pause', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
-    player.on('canplay', () => { if (bufferingOverlay) bufferingOverlay.classList.remove('visible'); });
-
-    player.on('ready', () => {
-        const videoWrapper = player.elements.container.querySelector('.plyr__video-wrapper');
-        if (!videoWrapper) return;
-        
-        const overlayTitle = document.getElementById('player-overlay-title'); 
-        const buffer = document.getElementById('buffering-overlay');
-        
-        if(overlayTitle) videoWrapper.appendChild(overlayTitle); 
-        if(buffer) videoWrapper.appendChild(buffer);
-        
-        player.on('controlsshown', () => { if(overlayTitle) overlayTitle.classList.add('visible'); });
-        player.on('controlshidden', () => { if(overlayTitle && !player.paused) overlayTitle.classList.remove('visible'); });
-        if(overlayTitle) overlayTitle.classList.add('visible');
-
-        const rewindIcon = document.getElementById('rewind-icon-overlay'), forwardIcon = document.getElementById('forward-icon-overlay'), playPauseIcon = document.getElementById('play-pause-icon-overlay');
-        if (rewindIcon) videoWrapper.appendChild(rewindIcon); if (forwardIcon) videoWrapper.appendChild(forwardIcon); if (playPauseIcon) videoWrapper.appendChild(playPauseIcon);
-
-        let lastTapTime = 0, tapTimeout = null;
-        const playSvg = document.getElementById('svg-play') ? document.getElementById('svg-play').cloneNode(true) : null;
-        const pauseSvg = document.getElementById('svg-pause') ? document.getElementById('svg-pause').cloneNode(true) : null;
-        if(playSvg) playSvg.style.display = 'block'; if(pauseSvg) pauseSvg.style.display = 'block';
-
-        function showSeekIcon(type) {
-            if(rewindIcon) rewindIcon.classList.remove('visible'); if(forwardIcon) forwardIcon.classList.remove('visible'); if(playPauseIcon) playPauseIcon.classList.remove('visible');
-            let iconToShow = (type === 'rewind') ? rewindIcon : (type === 'forward') ? forwardIcon : playPauseIcon;
-            if (type === 'play-pause' && playPauseIcon) {
-                playPauseIcon.innerHTML = '';
-                if (player.paused && pauseSvg) playPauseIcon.appendChild(pauseSvg); else if (!player.paused && playSvg) playPauseIcon.appendChild(playSvg);
-            }
-            if (iconToShow) { iconToShow.classList.add('visible'); setTimeout(() => iconToShow.classList.remove('visible'), 500); }
-        }
-
-        videoWrapper.addEventListener('click', (event) => {
-            if (event.target.closest('.plyr__controls')) return;
-            event.stopPropagation();
-            const currentTime = new Date().getTime();
-            if (currentTime - lastTapTime > 0 && currentTime - lastTapTime < 300) {
-                if (tapTimeout) clearTimeout(tapTimeout);
-                const tapX = event.clientX - videoWrapper.getBoundingClientRect().left;
-                if (tapX < videoWrapper.getBoundingClientRect().width * 0.35) { player.rewind(10); showSeekIcon('rewind'); }
-                else if (tapX > videoWrapper.getBoundingClientRect().width * 0.65) { player.forward(10); showSeekIcon('forward'); }
-                else { showSeekIcon('play-pause'); player.togglePlay(); }
-                lastTapTime = 0;
-            } else {
-                event.preventDefault(); tapTimeout = setTimeout(() => { player.toggleControls(); }, 300);
-            }
-            lastTapTime = currentTime;
-        });
-        videoWrapper.addEventListener('dblclick', (e) => { e.preventDefault(); e.stopPropagation(); });
-    });
-
-    let lastSaveTime = 0; 
-    player.on("timeupdate", () => {
-        const userX = window.currentUserXID;
-        if (userX && window.currentEpData && !player.paused && player.currentTime > 5 && Date.now() - lastSaveTime > 5000) { 
-            let pageName = window.location.pathname.substring(window.location.pathname.lastIndexOf('/') + 1) || "videos.html"; 
-            const safeId = userX.replace(/[.#$[\]]/g, "_");
-            db.ref('watchHistory/' + safeId + '/' + window.currentEpData.id).update({ id: window.currentEpData.id, title: window.currentEpData.title, image: window.currentEpData.image, currentTime: player.currentTime, duration: player.duration || 0, timestamp: Date.now(), page: pageName });
-            lastSaveTime = Date.now();
-        }
-    });
-}
-window.addEventListener('beforeunload', () => { if (currentPresenceRef) currentPresenceRef.remove(); });
-</script>
-
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => {
-      reg.onupdatefound = () => {
-        const newSW = reg.installing;
-        newSW.onstatechange = () => { if (newSW.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
-      };
-    }).catch(err => {});
-  }
-</script>
-
-<div id="rewind-icon-overlay" class="seek-overlay">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.9998 1.5V6.4428C5.5598 6.9048 2.4418 10.3368 2.4418 14.8828C2.4418 19.8288 6.4418 23.8288 11.3878 23.8288C15.8278 23.8288 19.4678 20.4968 20.0758 16.1988H17.5558C17.0098 18.9888 14.4838 21.3288 11.3878 21.3288C7.8118 21.3288 4.9418 18.4588 4.9418 14.8828C4.9418 11.6688 7.3738 9.0708 10.4998 8.6148V13.4998L17.4998 7.4998L9.9998 1.5Z"/></svg>
 </div>
-<div id="forward-icon-overlay" class="seek-overlay">
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.0002 1.5L6.50016 7.49984L14.0002 13.4998V8.61484C17.1262 9.07084 19.5582 11.6688 19.5582 14.8828C19.5582 18.4588 16.6882 21.3288 13.1122 21.3288C10.0162 21.3288 7.49016 18.9888 6.94416 16.1988H4.42416C5.03216 20.4968 8.67216 23.8288 13.1122 23.8288C18.0582 23.8288 22.0582 19.8288 22.0582 14.8828C22.0582 10.3368 18.9402 6.90484 14.5002 6.44284V1.5Z"/></svg>
-</div>
-<div id="play-pause-icon-overlay" class="seek-overlay"></div>
 
-<svg id="svg-play" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.14V19.14L19 12.14L8 5.14Z"/></svg>
-<svg id="svg-pause" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19H10V5H6V19ZM14 5V19H18V5H14Z"/></svg>
+<script>
+const toggle = document.getElementById("themeToggle");
+
+if (localStorage.getItem("theme") === "dark") {
+  document.body.classList.add("dark");
+  toggle.checked = true;
+}
+
+toggle.addEventListener("change", () => {
+  if (toggle.checked) {
+    document.body.classList.add("dark");
+    localStorage.setItem("theme", "dark");
+  } else {
+    document.body.classList.remove("dark");
+    localStorage.setItem("theme", "light");
+  }
+});
+</script>
 
 </body>
 </html>
